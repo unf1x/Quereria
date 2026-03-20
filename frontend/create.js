@@ -262,9 +262,22 @@ finishBtn.addEventListener("click", function () {
 
   quizzes.push(quiz);
 
-  localStorage.setItem("quizzes", JSON.stringify(quizzes));
-
-  alert("Квиз сохранён!");
-  window.location.href = "index.html";
+fetch("http://localhost:8080/api/quizzes", {
+  method: "POST",
+  headers: {"Content-Type": "application/json"},
+  body: JSON.stringify(quiz)
+})
+.then(response => {
+  if (!response.ok) throw new Error("Ошибка при сохранении");
+  return response.json();
+})
+.then(data => {
+  alert("Квиз сохранён!");         // <-- сюда
+  window.location.href = "index.html"; // <-- сюда
+})
+.catch(err => {
+  console.error(err);
+  alert("Ошибка при сохранении квиза");
+});
 
 });
