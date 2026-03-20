@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Создание квиза</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<header class="header container">
+
+  <div class="logo">Q</div>
+
+  <nav class="nav">
+    <a href="index.html">Главная</a>
+    <a href="history.html">История</a>
+    <a href="create.html" class="active">Создание</a>
+    <a href="help.html">Помощь</a>
+  </nav>
+
+  <a href="profile.html" class="profile-btn"></a>
+
+</header>
+
+
+<main class="container">
+
+  <!-- вкладки -->
+  <div class="section-tabs">
+    <span class="tab active">Оформление</span>
+    <span class="tab">Обложка</span>
+  </div>
+
+
+  <!-- название -->
+  <div class="form-group">
+
+    <label for="quiz-title">Название:</label>
+
+    <input
+      type="text"
+      id="quiz-title"
+      placeholder="Введите текст"
+    >
+
+  </div>
+
+
+  <!-- описание -->
+  <div class="form-group">
+
+    <label for="quiz-description">Описание:</label>
+
+    <textarea
+      id="quiz-description"
+      placeholder="Введите описание"
+    ></textarea>
+
+  </div>
+
+
+  <!-- тип квиза -->
+  <div class="form-group">
+
+    <label>Вид квиза:</label>
+
+    <div class="checkbox-group">
+
+      <label>
+        <input type="checkbox" value="test">
+        Тест
+      </label>
+
+      <label>
+        <input type="checkbox" value="quiz">
+        Викторина
+      </label>
+
+      <label>
+        <input type="checkbox" value="fun">
+        Развлекательный
+      </label>
+
+    </div>
+
+  </div>
+
+
+  <!-- обложка -->
+  <div class="form-group">
+
+    <label for="cover-input">Обложка:</label>
+
+    <input
+      type="file"
+      id="cover-input"
+    >
+
+    <div class="cover-preview"></div>
+
+  </div>
+
+
+  <!-- ===== БЛОК ВОПРОСОВ ===== -->
+
+  <section class="questions-section">
+
+    <div class="questions-header">
+      <h3>Вопросы</h3>
+    </div>
+
+
+    <!-- сюда JS добавляет вопросы -->
+    <div id="questions-container"></div>
+
+
+    <div class="question-controls">
+
+        <button id="add-question-btn" class="add-btn">
+          <span class="plus">＋</span>
+          Добавить вопрос
+        </button>
+
+      <button
+        id="finish-btn"
+        class="finish-btn"
+      >
+        Завершить
+      </button>
+
+    </div>
+
+  </section>
+
+
+</main>
+
+
+<script type="module" src="create.js"></script>
+
+</body>
+</html>

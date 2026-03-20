@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz App</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="header container">
+    <div class="logo">Q</div>
+
+    <nav class="nav">
+      <a href="index.html" class="active">Главная</a>
+      <a href="history.html">История</a>
+      <a href="create.html">Создание</a>
+      <a href="help.html">Помощь</a>
+    </nav>
+
+    <a href="profile.html" class="profile-btn"></a>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <button id="create-btn" class="primary-btn">
+        Создать квиз
+      </button>
+    </section>
+
+    <section class="recent">
+      <h2>Недавно созданные квизы:</h2>
+
+      <!-- 🔥 JS будет вставлять карточки сюда -->
+      <div id="quiz-container" class="quiz-list"></div>
+
+    </section>
+
+  </main>
+
+  <!-- Подключаем JS -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
