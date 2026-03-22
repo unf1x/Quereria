@@ -29,6 +29,11 @@ async function loadQuizzes() {
       `;
 
       container.appendChild(card);
+
+      const openBtn = card.querySelector("button");
+      openBtn.addEventListener("click", () => {
+        window.location.href = `question.html?quizId=${quiz.id}`;
+      });
     });
   } catch (error) {
     console.error(error);
