@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - Квизтер</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600&family=Rufina:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        body {
+            background: #eeeeee;
+            padding: 30px 60px;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-family: 'Rufina', serif;
+            font-size: 42px;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: flex;
+            gap: 50px;
+            background: #f4f4f4;
+            padding: 15px 40px;
+            border-radius: 40px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 18px;
+            position: relative;
+        }
+
+        .nav a.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 100%;
+            height: 2px;
+            background: #e9dc6a;
+        }
+
+        .profile {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #e9dc6a;
+            cursor: pointer;
+        }
+
+        /* MAIN CONTENT */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 50px;
+            padding: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Avatar upload */
+        .avatar-upload {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .avatar-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #e9dc6a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .avatar-circle:hover {
+            transform: scale(1.05);
+        }
+
+        .avatar-icon {
+            font-size: 40px;
+            color: #333;
+        }
+
+        .avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-circle input {
+            display: none;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 18px 25px;
+            font-size: 22px;
+            border: 2px solid #d9d9d9;
+            border-radius: 60px;
+            outline: none;
+            font-family: 'Montserrat Alternates', sans-serif;
+            background: #f8f8f8;
+        }
+
+        .input-field::placeholder {
+            color: #aaa;
+            font-size: 22px;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 20px;
+            background: #d9d9d9;
+            border: none;
+            border-radius: 60px;
+            font-size: 24px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Montserrat Alternates', sans-serif;
+            color: #333;
+        }
+
+        .confirm-btn:hover {
+            background: #7a0042;
+            color: white;
+        }
+
+        .confirm-btn:active {
+            background: #7a0042;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            .nav {
+                display: none;
+            }
+            .container {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Q</div>
+        <div class="nav">
+            <a href="#" class="active">Главная</a>
+            <a href="#">История</a>
+            <a href="#">Создание</a>
+            <a href="#">Помощь</a>
+        </div>
+        <div class="profile" id="profileBtn"></div>
+    </div>
+
+    <div class="container">
+        <!-- Блок загрузки фото -->
+        <div class="avatar-upload">
+            <div class="avatar-circle" id="avatarCircle">
+                <span class="avatar-icon" id="avatarIcon">📷</span>
+                <input type="file" id="avatarInput" accept="image/*">
+            </div>
+        </div>
+
+        <div class="title">Введите никнейм</div>
+        <div class="input-group">
+            <input type="text" class="input-field" id="nickname" placeholder="Вася Пупкин" value="">
+        </div>
+
+        <button class="confirm-btn" id="confirmBtn">Подтвердить</button>
+    </div>
+
+    <script>
+        // Элементы
+        const avatarCircle = document.getElementById('avatarCircle');
+        const avatarInput = document.getElementById('avatarInput');
+        const avatarIcon = document.getElementById('avatarIcon');
+        const nicknameInput = document.getElementById('nickname');
+
+        // Загрузка фото
+        avatarCircle.addEventListener('click', () => {
+            avatarInput.click();
+        });
+
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    // Убираем иконку, показываем изображение
+                    avatarIcon.style.display = 'none';
+                    // Создаем или обновляем img
+                    let img = avatarCircle.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        avatarCircle.appendChild(img);
+                    }
+                    img.src = ev.target.result;
+                    // Сохраняем в localStorage
+                    localStorage.setItem('avatar', ev.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Восстановление аватара из localStorage при загрузке страницы
+        const savedAvatar = localStorage.getItem('avatar');
+        if (savedAvatar) {
+            avatarIcon.style.display = 'none';
+            let img = avatarCircle.querySelector('img');
+            if (!img) {
+                img = document.createElement('img');
+                avatarCircle.appendChild(img);
+            }
+            img.src = savedAvatar;
+        }
+
+        // Кнопка подтверждения
+        document.getElementById('confirmBtn').addEventListener('click', function() {
+            const nickname = nicknameInput.value.trim() || 'Вася Пупкин';
+            // Группа не используется, можно передавать пустую или удалить
+            const selectedGroup = ''; // если нужно, можно добавить выбор группы обратно
+
+            // Получаем текущий список игроков из localStorage
+            let players = JSON.parse(localStorage.getItem('quizPlayers')) || [];
+
+            // Проверяем, нет ли уже такого игрока
+            const exists = players.some(p => p.name === nickname && p.group === selectedGroup);
+            if (!exists) {
+                // Сохраняем также аватар? Можно сохранить ссылку на фото в объекте игрока.
+                // Для простоты сохраняем только имя и группу, а аватар уже в отдельном ключе.
+                players.push({ name: nickname, group: selectedGroup });
+                localStorage.setItem('quizPlayers', JSON.stringify(players));
+            }
+
+            // Переход на страницу quiz.html
+            window.location.href = 'waitingroom.html';
+        });
+
+        // Желтый кружок (профиль) - переходит в личный кабинет (заглушка)
+        document.getElementById('profileBtn').addEventListener('click', function() {
+            alert('Личный кабинет');
+        });
+
+        // Подсветка активного пункта меню
+        const navLinks = document.querySelectorAll('.nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
