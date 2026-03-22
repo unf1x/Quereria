@@ -1,9 +1,9 @@
 package com.project.Quereria.controller;
 
-import com.project.Quereria.dto.QuizCreateResponse;
-import com.project.Quereria.dto.QuizSummaryResponse;
-import com.project.Quereria.entity.Quiz;
-import com.project.Quereria.entity.QuizRequest;
+import com.project.Quereria.dto.response.QuizCreateResponse;
+import com.project.Quereria.dto.response.QuizFullResponse;
+import com.project.Quereria.dto.response.QuizSummaryResponse;
+import com.project.Quereria.dto.request.QuizRequest;
 import com.project.Quereria.service.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +29,8 @@ public class QuizController {
         return ResponseEntity.ok(quizService.getAllQuizzes());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Quiz> getQuizById(@PathVariable Long id) {
-        return ResponseEntity.ok(quizService.getQuizById(id));
+    @GetMapping("/{id}/full")
+    public ResponseEntity<QuizFullResponse> getQuizFull(@PathVariable Long id) {
+        return ResponseEntity.ok(quizService.getQuizFullById(id));
     }
 }

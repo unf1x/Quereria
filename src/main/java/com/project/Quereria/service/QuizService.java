@@ -1,6 +1,12 @@
 package com.project.Quereria.service;
 
-import com.project.Quereria.dto.QuizSummaryResponse;
+import com.project.Quereria.dto.response.AnswerResponse;
+import com.project.Quereria.dto.response.QuestionResponse;
+import com.project.Quereria.dto.response.QuizFullResponse;
+import com.project.Quereria.dto.response.QuizSummaryResponse;
+import com.project.Quereria.dto.request.QuestionRequest;
+import com.project.Quereria.dto.request.QuizRequest;
+import com.project.Quereria.dto.request.TimeRequest;
 import com.project.Quereria.entity.*;
 import com.project.Quereria.entity.enums.QuestionType;
 import com.project.Quereria.repository.*;
@@ -9,8 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -117,9 +123,64 @@ public class QuizService {
         return result;
     }
 
-    public Quiz getQuizById(Long id) {
-        return quizRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Квиз не найден: " + id));
+    public QuizFullResponse getQuizFullById(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new IllegalArgumentException("Квиз не найден: " + quizId));
+
+        List<QuizQuestionLink> links = quizQuestionLinkRepository.findByQuizId(quizId);
+
+        List<Long> questionIds = links.stream()
+                .map(link -> link.getQuestion().getId())
+                .toList();
+
+        List<Question> questions = questionIds.isEmpty()
+                ? Collections.emptyList()
+                : questionRepository.findByIdIn(questionIds);
+
+        Map<Long, Question> questionMap = questions.stream()
+                .collect(Collectors.toMap(Question::getId, q -> q));
+
+        List<QuestionAnswerBond> allBonds = questionIds.isEmpty()
+                ? Collections.emptyList()
+                : questionAnswerBondRepository.findByQuestionIdIn(questionIds);
+
+        Map<Long, List<QuestionAnswerBond>> bondsByQuestionId = allBonds.stream()
+                .collect(Collectors.groupingBy(bond -> bond.getQuestion().getId()));
+
+        List<QuestionResponse> questionResponses = links.stream()
+                .map(link -> {
+                    Long questionId = link.getQuestion().getId();
+                    Question question = questionMap.get(questionId);
+
+                    List<AnswerResponse> answers = bondsByQuestionId
+                            .getOrDefault(questionId, Collections.emptyList())
+                            .stream()
+                            .map(bond -> new AnswerResponse(
+                                    bond.getAnswer().getId(),
+                                    bond.getAnswer().getText(),
+                                    bond.getIsCorrected()
+                            ))
+                            .toList();
+
+                    return new QuestionResponse(
+                            question.getId(),
+                            question.getNumber(),
+                            question.getText(),
+                            question.getType().name(),
+                            question.getTimerSeconds(),
+                            answers
+                    );
+                })
+                .sorted(Comparator.comparing(QuestionResponse::getNumber))
+                .toList();
+
+        return new QuizFullResponse(
+                quiz.getId(),
+                quiz.getName(),
+                quiz.getDescription(),
+                quiz.getDateOfCreation(),
+                questionResponses
+        );
     }
 
     private void validateQuizRequest(QuizRequest request) {
@@ -136,6 +197,10 @@ public class QuizService {
         }
 
         for (QuestionRequest q : request.getQuestions()) {
+            if (q.getText() == null || q.getText().trim().isEmpty()) {
+                throw new IllegalArgumentException("Текст вопроса обязателен");
+            }
+
             if (!Boolean.TRUE.equals(q.getOpen()) && !Boolean.TRUE.equals(q.getHasAnswers())) {
                 throw new IllegalArgumentException("У вопроса должен быть либо открытый ответ, либо варианты ответа");
             }
@@ -163,8 +228,10 @@ public class QuizService {
             return null;
         }
 
-        return time.getHours() * 3600
-                + time.getMinutes() * 60
-                + time.getSeconds();
+        int hours = time.getHours();
+        int minutes = time.getMinutes();
+        int seconds = time.getSeconds();
+
+        return hours * 3600 + minutes * 60 + seconds;
     }
 }

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface QuestionAnswerBondRepository extends JpaRepository<QuestionAnswerBond, Long> {
     List<QuestionAnswerBond> findByQuestionId(Long questionId);
+    List<QuestionAnswerBond> findByQuestionIdIn(List<Long> questionIds);
 }

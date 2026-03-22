@@ -1,4 +1,4 @@
-package com.project.Quereria.entity;
+package com.project.Quereria.dto.request;
 
 import lombok.Data;
 

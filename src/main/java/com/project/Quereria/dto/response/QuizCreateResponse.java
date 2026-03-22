@@ -1,4 +1,4 @@
-package com.project.Quereria.dto;
+package com.project.Quereria.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
