@@ -188,27 +188,33 @@ function addQuestion() {
 
 }
 
-// ===== СОХРАНЕНИЕ КВИЗА =====
 var finishBtn = document.getElementById("finish-btn");
 
 finishBtn.addEventListener("click", function () {
+  var title = document.getElementById("quiz-title").value.trim();
+  var description = document.getElementById("quiz-description").value.trim();
 
-  var title = document.getElementById("quiz-title").value;
-  var description = document.getElementById("quiz-description").value;
+  if (!title) {
+    alert("Введите название квиза");
+    return;
+  }
 
   var questions = [];
-
   var cards = document.querySelectorAll(".question-card");
 
+  if (cards.length === 0) {
+    alert("Добавьте хотя бы один вопрос");
+    return;
+  }
+
   cards.forEach(function (card) {
+    var text = card.querySelector(".question-text").value.trim();
 
-    var text = card.querySelector(".question-text").value;
+    var open = card.querySelector(".open-check")?.checked || false;
+    var openAnswer = card.querySelector(".open-answer-input")?.value?.trim() || "";
 
-    var open = card.querySelector(".open-check")?.checked;
-    var openAnswer = card.querySelector(".open-answer-input")?.value || "";
-
-    var hasAnswers = card.querySelector(".answers-check")?.checked;
-    var hasTimer = card.querySelector(".time-check")?.checked;
+    var hasAnswers = card.querySelector(".answers-check")?.checked || false;
+    var hasTimer = card.querySelector(".time-check")?.checked || false;
 
     var answers = [];
     var correctIndex = null;
@@ -217,22 +223,23 @@ finishBtn.addEventListener("click", function () {
       var answerItems = card.querySelectorAll(".answer-item");
 
       answerItems.forEach(function (item, index) {
-
         var input = item.querySelector("input[type='text']");
         var radio = item.querySelector("input[type='radio']");
+        var value = input.value.trim();
 
-        answers.push(input.value);
+        if (value) {
+          answers.push(value);
 
-        if (radio.checked) {
-          correctIndex = index;
+          if (radio.checked) {
+            correctIndex = answers.length - 1;
+          }
         }
-
       });
     }
 
-    var hours = card.querySelector(".time-hours")?.value || 0;
-    var minutes = card.querySelector(".time-minutes")?.value || 0;
-    var seconds = card.querySelector(".time-seconds")?.value || 0;
+    var hours = Number(card.querySelector(".time-hours")?.value || 0);
+    var minutes = Number(card.querySelector(".time-minutes")?.value || 0);
+    var seconds = Number(card.querySelector(".time-seconds")?.value || 0);
 
     questions.push({
       text,
@@ -243,41 +250,40 @@ finishBtn.addEventListener("click", function () {
       correctIndex,
       hasTimer,
       time: {
-        hours: Number(hours),
-        minutes: Number(minutes),
-        seconds: Number(seconds)
+        hours,
+        minutes,
+        seconds
       }
     });
-
   });
 
   var quiz = {
-    id: Date.now(),
     title,
     description,
     questions
   };
 
-  var quizzes = JSON.parse(localStorage.getItem("quizzes")) || [];
-
-  quizzes.push(quiz);
-
-fetch("http://localhost:8080/api/quizzes", {
-  method: "POST",
-  headers: {"Content-Type": "application/json"},
-  body: JSON.stringify(quiz)
-})
-.then(response => {
-  if (!response.ok) throw new Error("Ошибка при сохранении");
-  return response.json();
-})
-.then(data => {
-  alert("Квиз сохранён!");         // <-- сюда
-  window.location.href = "index.html"; // <-- сюда
-})
-.catch(err => {
-  console.error(err);
-  alert("Ошибка при сохранении квиза");
-});
-
+  fetch("http://localhost:8080/api/quizzes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(quiz)
+  })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => {
+          throw new Error(err.error || "Ошибка при сохранении");
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      alert("Квиз сохранён");
+      window.location.href = "index.html";
+    })
+    .catch(err => {
+      console.error(err);
+      alert(err.message || "Ошибка при сохранении квиза");
+    });
 });

@@ -1,39 +1,43 @@
-// Получаем квизы из localStorage
-function getQuizzes() {
-  return JSON.parse(localStorage.getItem("quizzes")) || [];
-}
-
-// Рендер карточек
-function renderQuizzes() {
+async function loadQuizzes() {
   const container = document.getElementById("quiz-container");
-  container.innerHTML = "";
+  container.innerHTML = "<p>Загрузка...</p>";
 
-  const quizzes = getQuizzes();
+  try {
+    const response = await fetch("http://localhost:8080/api/quizzes");
 
-  if (quizzes.length === 0) {
-    container.innerHTML = "<p>Пока нет квизов</p>";
-    return;
+    if (!response.ok) {
+      throw new Error("Ошибка загрузки квизов");
+    }
+
+    const quizzes = await response.json();
+    container.innerHTML = "";
+
+    if (!quizzes.length) {
+      container.innerHTML = "<p>Пока нет квизов</p>";
+      return;
+    }
+
+    quizzes.forEach(quiz => {
+      const card = document.createElement("div");
+      card.classList.add("quiz-card");
+
+      card.innerHTML = `
+        <h3>${quiz.title}</h3>
+        <p>${quiz.description || "Без описания"}</p>
+        <p>Количество вопросов: ${quiz.questionCount}</p>
+        <button data-id="${quiz.id}">Открыть</button>
+      `;
+
+      container.appendChild(card);
+    });
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = "<p>Не удалось загрузить квизы</p>";
   }
-
-  quizzes.forEach(quiz => {
-    const card = document.createElement("div");
-    card.classList.add("quiz-card");
-
-    card.innerHTML = `
-      <h3>${quiz.title}</h3>
-      <p>Количество вопросов: ${quiz.questions.length}</p>
-      <button data-id="${quiz.id}">Открыть</button>
-    `;
-
-    container.appendChild(card);
-  });
 }
 
-// Кнопка "Создать квиз"
-document.getElementById("create-btn")
-  .addEventListener("click", () => {
-    window.location.href = "create.html";
-  });
+document.getElementById("create-btn").addEventListener("click", () => {
+  window.location.href = "create.html";
+});
 
-// Запуск
-renderQuizzes();
+loadQuizzes();

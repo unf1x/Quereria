@@ -26,4 +26,7 @@ public class Question {
 
     @Column(name = "timer_seconds")
     private Integer timerSeconds;
+
+    @Column(name = "text")
+    private String text;
 }
