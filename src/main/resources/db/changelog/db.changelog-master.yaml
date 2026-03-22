@@ -4,3 +4,6 @@ databaseChangeLog:
 
   - include:
       file: db/changelog/migrations/002-add-question-text.sql
+
+  - include:
+      file: db/changelog/migrations/003-make-result-user-nullable.sql

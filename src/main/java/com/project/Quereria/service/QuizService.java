@@ -1,22 +1,25 @@
 package com.project.Quereria.service;
 
-import com.project.Quereria.dto.response.AnswerResponse;
-import com.project.Quereria.dto.response.QuestionResponse;
-import com.project.Quereria.dto.response.QuizFullResponse;
-import com.project.Quereria.dto.response.QuizSummaryResponse;
-import com.project.Quereria.dto.request.QuestionRequest;
 import com.project.Quereria.dto.request.QuizRequest;
+import com.project.Quereria.dto.request.QuestionRequest;
 import com.project.Quereria.dto.request.TimeRequest;
+import com.project.Quereria.dto.request.QuizSubmitRequest;
+import com.project.Quereria.dto.request.SubmitAnswerItemRequest;
+import com.project.Quereria.dto.response.*;
 import com.project.Quereria.entity.*;
 import com.project.Quereria.entity.enums.QuestionType;
 import com.project.Quereria.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.project.Quereria.dto.response.ResultResponse;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import com.project.Quereria.entity.Result;
+import com.project.Quereria.repository.ResultRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class QuizService {
     private final AnswerRepository answerRepository;
     private final QuizQuestionLinkRepository quizQuestionLinkRepository;
     private final QuestionAnswerBondRepository questionAnswerBondRepository;
+    private final ResultRepository resultRepository;
 
     @Transactional
     public Long createQuiz(QuizRequest request) {
@@ -233,5 +237,198 @@ public class QuizService {
         int seconds = time.getSeconds();
 
         return hours * 3600 + minutes * 60 + seconds;
+    }
+    public QuizPlayResponse getQuizForPlay(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new IllegalArgumentException("Квиз не найден: " + quizId));
+
+        List<QuizQuestionLink> links = quizQuestionLinkRepository.findByQuizId(quizId);
+
+        List<Long> questionIds = links.stream()
+                .map(link -> link.getQuestion().getId())
+                .toList();
+
+        List<Question> questions = questionIds.isEmpty()
+                ? Collections.emptyList()
+                : questionRepository.findByIdIn(questionIds);
+
+        Map<Long, Question> questionMap = questions.stream()
+                .collect(Collectors.toMap(Question::getId, q -> q));
+
+        List<QuestionAnswerBond> allBonds = questionIds.isEmpty()
+                ? Collections.emptyList()
+                : questionAnswerBondRepository.findByQuestionIdIn(questionIds);
+
+        Map<Long, List<QuestionAnswerBond>> bondsByQuestionId = allBonds.stream()
+                .collect(Collectors.groupingBy(bond -> bond.getQuestion().getId()));
+
+        List<PlayQuestionResponse> questionResponses = links.stream()
+                .map(link -> {
+                    Long questionId = link.getQuestion().getId();
+                    Question question = questionMap.get(questionId);
+
+                    List<PlayAnswerResponse> answers = bondsByQuestionId
+                            .getOrDefault(questionId, Collections.emptyList())
+                            .stream()
+                            .map(bond -> new PlayAnswerResponse(
+                                    bond.getAnswer().getId(),
+                                    bond.getAnswer().getText()
+                            ))
+                            .toList();
+
+                    return new PlayQuestionResponse(
+                            question.getId(),
+                            question.getNumber(),
+                            question.getText(),
+                            question.getType().name(),
+                            question.getTimerSeconds(),
+                            answers
+                    );
+                })
+                .sorted(Comparator.comparing(PlayQuestionResponse::getNumber))
+                .toList();
+
+        return new QuizPlayResponse(
+                quiz.getId(),
+                quiz.getName(),
+                quiz.getDescription(),
+                questionResponses
+        );
+    }
+
+    public List<ResultResponse> getQuizResults(Long quizId) {
+        quizRepository.findById(quizId)
+                .orElseThrow(() -> new IllegalArgumentException("Квиз не найден: " + quizId));
+
+        return resultRepository.findByQuizIdOrderByCreatedAtDesc(quizId).stream()
+                .map(result -> new ResultResponse(
+                        result.getId(),
+                        result.getQuiz().getId(),
+                        result.getScore(),
+                        result.getUserId(),
+                        result.getCreatedAt()
+                ))
+                .toList();
+    }
+
+    public QuizSubmitResponse submitQuiz(Long quizId, QuizSubmitRequest request) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new IllegalArgumentException("Квиз не найден: " + quizId));
+
+        List<QuizQuestionLink> links = quizQuestionLinkRepository.findByQuizId(quizId);
+
+        List<Long> questionIds = links.stream()
+                .map(link -> link.getQuestion().getId())
+                .toList();
+
+        List<Question> questions = questionIds.isEmpty()
+                ? Collections.emptyList()
+                : questionRepository.findByIdIn(questionIds);
+
+        Map<Long, Question> questionMap = questions.stream()
+                .collect(Collectors.toMap(Question::getId, Function.identity()));
+
+        List<QuestionAnswerBond> allBonds = questionIds.isEmpty()
+                ? Collections.emptyList()
+                : questionAnswerBondRepository.findByQuestionIdIn(questionIds);
+
+        Map<Long, List<QuestionAnswerBond>> bondsByQuestionId = allBonds.stream()
+                .collect(Collectors.groupingBy(bond -> bond.getQuestion().getId()));
+
+        Map<Long, SubmitAnswerItemRequest> userAnswersByQuestionId =
+                request == null || request.getAnswers() == null
+                        ? Collections.emptyMap()
+                        : request.getAnswers().stream()
+                        .filter(a -> a.getQuestionId() != null)
+                        .collect(Collectors.toMap(
+                                SubmitAnswerItemRequest::getQuestionId,
+                                Function.identity(),
+                                (a, b) -> a
+                        ));
+
+        List<QuestionResultResponse> results = links.stream()
+                .map(link -> {
+                    Long questionId = link.getQuestion().getId();
+                    Question question = questionMap.get(questionId);
+                    List<QuestionAnswerBond> bonds = bondsByQuestionId.getOrDefault(questionId, Collections.emptyList());
+
+                    SubmitAnswerItemRequest userAnswer = userAnswersByQuestionId.get(questionId);
+
+                    if (question.getType().name().equals("CHOICE")) {
+                        QuestionAnswerBond correctBond = bonds.stream()
+                                .filter(bond -> Boolean.TRUE.equals(bond.getIsCorrected()))
+                                .findFirst()
+                                .orElse(null);
+
+                        Long correctAnswerId = correctBond != null ? correctBond.getAnswer().getId() : null;
+                        String correctAnswerText = correctBond != null ? correctBond.getAnswer().getText() : null;
+
+                        Long selectedAnswerId = userAnswer != null ? userAnswer.getSelectedAnswerId() : null;
+
+                        String userAnswerText = bonds.stream()
+                                .filter(b -> selectedAnswerId != null && b.getAnswer().getId().equals(selectedAnswerId))
+                                .map(b -> b.getAnswer().getText())
+                                .findFirst()
+                                .orElse(null);
+
+                        boolean isCorrect = selectedAnswerId != null && selectedAnswerId.equals(correctAnswerId);
+
+                        return new QuestionResultResponse(
+                                question.getId(),
+                                question.getNumber(),
+                                question.getText(),
+                                isCorrect,
+                                correctAnswerText,
+                                userAnswerText
+                        );
+                    }
+
+                    if (question.getType().name().equals("OPEN")) {
+                        String userTextAnswer = userAnswer != null ? userAnswer.getTextAnswer() : null;
+
+                        return new QuestionResultResponse(
+                                question.getId(),
+                                question.getNumber(),
+                                question.getText(),
+                                false,
+                                null,
+                                userTextAnswer
+                        );
+                    }
+
+                    return new QuestionResultResponse(
+                            question.getId(),
+                            question.getNumber(),
+                            question.getText(),
+                            false,
+                            null,
+                            null
+                    );
+                })
+                .sorted(Comparator.comparing(QuestionResultResponse::getQuestionNumber))
+                .toList();
+
+        int totalQuestions = results.size();
+        int correctAnswers = (int) results.stream().filter(QuestionResultResponse::isCorrect).count();
+        int wrongAnswers = totalQuestions - correctAnswers;
+        int scorePercent = totalQuestions == 0 ? 0 : (correctAnswers * 100) / totalQuestions;
+
+        Result savedResult = resultRepository.save(
+                Result.builder()
+                        .score(scorePercent)
+                        .userId(null)
+                        .quiz(quiz)
+                        .createdAt(LocalDateTime.now())
+                        .build()
+        );
+
+        return new QuizSubmitResponse(
+                quiz.getId(),
+                totalQuestions,
+                correctAnswers,
+                wrongAnswers,
+                scorePercent,
+                results
+        );
     }
 }
