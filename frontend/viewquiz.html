@@ -1,166 +1,179 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Просмотр квиза</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр квиза</title>
 
-  <!-- Стили -->
-  <link rel="stylesheet" href="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/css/base.css">
-  <link rel="stylesheet" href="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/css/header.css">
-  <link rel="stylesheet" href="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/css/waitingroom.css">
-  <link rel="stylesheet" href="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/css/viewquiz.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/waitingroom.css">
+    <link rel="stylesheet" href="css/viewquiz.css">
 
-  <!-- Шрифты -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Rufina:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rufina:wght@700&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
-  <!-- HEADER -->
-  <header class="header">
+<header class="header">
     <div class="left-block">
-      <div class="logo">Q</div>
-      <div class="burger" id="burger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
+        <div class="logo">Q</div>
+        <div class="burger" id="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </div>
 
     <nav class="menu" id="menu">
-      <a href="indexaboba.html" class="menu-item">Главная</a>
-      <a href="history.html" class="menu-item">История</a>
-      <a href="index.html" class="menu-item">Создание</a>
-      <a href="help.html" class="menu-item">Помощь</a>
+        <a href="index.html" class="menu-item" data-page="index.html">Главная</a>
+        <a href="history.html" class="menu-item" data-page="history.html">История</a>
+        <a href="create.html" class="menu-item" data-page="create.html">Создание</a>
+        <a href="help.html" class="menu-item" data-page="help.html">Помощь</a>
     </nav>
 
     <div class="profile" id="profileBtn"></div>
-  </header>
+</header>
 
-  <!-- MAIN -->
-  <div class="main">
-
-    <!-- ЛЕВАЯ ЧАСТЬ -->
+<div class="main">
     <div class="quiz-info">
-      <h2 id="quizTitle">Исторический батл</h2>
+        <h2 id="quizTitle">Загрузка...</h2>
 
-      <p class="label">Описание:</p>
-      <p id="quizDescription">
-        Квиз предназначен для проверки базовых знаний по мировой истории.
-      </p>
+        <p class="label">Описание:</p>
+        <p id="quizDescription">—</p>
 
-      <p class="label">Количество вопросов:</p>
-      <p id="quizQuestions">3</p>
+        <p class="label">Количество вопросов:</p>
+        <p id="quizQuestions">—</p>
 
-      <p class="label">Время прохождения:</p>
-      <p id="quizTime">1 мин 15 сек</p>
+        <p class="label">Время прохождения:</p>
+        <p id="quizTime">—</p>
 
-      <p class="label">Вид квиза:</p>
-      <p id="quizType">Тест</p>
+        <p class="label">Вид квиза:</p>
+        <p id="quizType">—</p>
     </div>
 
-    <!-- ПРАВАЯ ЧАСТЬ -->
     <div class="right">
-      <img class="quiz-image"
-           src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da"
-           alt="quiz image">
+        <img class="quiz-image" src="img/history_quiz.png" alt="quiz image">
 
-      <div class="author" id="quizAuthor">
-        Автор: Чуракова Диана
-      </div>
-
-      <!-- Ссылка -->
-      <div class="link-block">
-        <input type="text" id="quizLink"
-               value="https://quizter.com/quiz/123456"
-               readonly>
-
-        <div class="copy-icon" id="copyLinkBtn" title="Копировать ссылку">
-          <img src="copy-icon.png" class="icon" alt="copy">
+        <div class="author" id="quizAuthor">
+            Автор: локально не задан
         </div>
-      </div>
 
-      <!-- Код -->
-      <div class="code-block">
-        <span>Код квиза:</span>
-
-        <div class="code" id="quizCode">1234567</div>
-
-        <div class="code-copy-icon" id="copyCodeBtn" title="Копировать код">
-          <img src="copy-icon.png" class="icon" alt="copy">
+        <div class="link-block">
+            <input type="text" id="quizLink" readonly>
+            <div class="copy-icon" id="copyLinkBtn" title="Копировать ссылку">⧉</div>
         </div>
-      </div>
+
+        <div class="code-block">
+            <span>Код квиза:</span>
+            <div class="code" id="quizCode">—</div>
+            <div class="code-copy-icon" id="copyCodeBtn" title="Копировать код">⧉</div>
+        </div>
     </div>
-  </div>
+</div>
 
-  <!-- КНОПКИ -->
-  <div class="organizer-controls">
+<div class="organizer-controls">
     <div class="left-controls">
-      <button class="btn start-btn" id="editQuizBtn">
-        Редактировать
-      </button>
-
-      <button class="trash-btn" id="deleteQuizBtn">
-        <img src="trash.png" alt="Удалить" class="trash-icon">
-      </button>
+        <button class="btn start-btn" id="editQuizBtn">Назад к созданию</button>
     </div>
 
     <button class="btn start-btn" id="launchQuizBtn">
-      Запустить квиз
+        Запустить квиз
     </button>
-  </div>
+</div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast">Скопировано!</div>
+<div class="toast" id="toast">Скопировано!</div>
 
-  <!-- JS -->
-  <script src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/js/header.js" type="module"></script>
+<script type="module" src="js/header.js"></script>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const quizId = params.get("id");
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.style.display = "block";
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 2000);
+    }
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 2000);
+    function formatTime(totalSeconds) {
+      if (!totalSeconds) return "Без лимита";
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      if (minutes === 0) return `${seconds} сек`;
+      return `${minutes} мин ${seconds} сек`;
+    }
+
+    function detectQuizType(questions) {
+      if (!questions || !questions.length) return "Не указан";
+
+      const hasOpen = questions.some(q => q.type === "OPEN");
+      const hasChoice = questions.some(q => q.type === "CHOICE");
+
+      if (hasOpen && hasChoice) return "Смешанный";
+      if (hasChoice) return "Тест";
+      if (hasOpen) return "Открытый";
+      return "Не указан";
+    }
+
+    async function loadQuiz() {
+      if (!quizId) {
+        alert("Не передан id квиза");
+        window.location.href = "index.html";
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/quizzes/${quizId}/full`);
+
+        if (!response.ok) {
+          throw new Error("Не удалось загрузить квиз");
         }
 
-        // Копирование ссылки
-        document.getElementById('copyLinkBtn').addEventListener('click', async () => {
-            const text = document.getElementById('quizLink').value;
-            await navigator.clipboard.writeText(text);
-            showToast('Ссылка скопирована!');
-        });
+        const quiz = await response.json();
 
-        // Копирование кода
-        document.getElementById('copyCodeBtn').addEventListener('click', async () => {
-            const text = document.getElementById('quizCode').textContent;
-            await navigator.clipboard.writeText(text);
-            showToast('Код скопирован!');
-        });
+        document.getElementById("quizTitle").textContent = quiz.title || "Без названия";
+        document.getElementById("quizDescription").textContent = quiz.description || "Без описания";
+        document.getElementById("quizQuestions").textContent = quiz.questions?.length || 0;
 
-        // Редактировать
-        document.getElementById('editQuizBtn').addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
+        const totalTime = (quiz.questions || []).reduce((sum, q) => {
+          return sum + (q.timerSeconds || 0);
+        }, 0);
 
-        // Удалить
-        document.getElementById('deleteQuizBtn').addEventListener('click', () => {
-            if (confirm('Вы уверены, что хотите удалить этот квиз?')) {
-                alert('Квиз удалён!');
-            }
-        });
+        document.getElementById("quizTime").textContent = formatTime(totalTime);
+        document.getElementById("quizType").textContent = detectQuizType(quiz.questions);
 
-        // Запустить
-        document.getElementById('launchQuizBtn').addEventListener('click', () => {
-            window.location.href = 'waitingroom.html';
-        });
+        const link = `${window.location.origin}/nickname.html?quizId=${quiz.id}`;
+        document.getElementById("quizLink").value = link;
+        document.getElementById("quizCode").textContent = String(quiz.id);
+      } catch (error) {
+        console.error(error);
+        alert("Ошибка загрузки квиза");
+        window.location.href = "index.html";
+      }
+    }
 
+    document.getElementById("copyLinkBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText(document.getElementById("quizLink").value);
+      showToast("Ссылка скопирована");
     });
-  </script>
 
+    document.getElementById("copyCodeBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText(document.getElementById("quizCode").textContent);
+      showToast("ID скопирован");
+    });
+
+    document.getElementById("editQuizBtn").addEventListener("click", () => {
+      window.location.href = "create.html";
+    });
+
+    document.getElementById("launchQuizBtn").addEventListener("click", () => {
+      window.location.href = `waitingroom_user.html?quizId=${quizId}`;
+    });
+
+    loadQuiz();
+</script>
 </body>
 </html>

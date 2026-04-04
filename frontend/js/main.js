@@ -3,7 +3,7 @@ async function loadQuizzes() {
   container.innerHTML = "<p>Загрузка...</p>";
 
   try {
-    const response = await fetch("http://localhost:8080/api/quizzes");
+    const response = await fetch("/api/quizzes");
 
     if (!response.ok) {
       throw new Error("Ошибка загрузки квизов");
@@ -30,10 +30,10 @@ async function loadQuizzes() {
 
       container.appendChild(card);
 
-      const openBtn = card.querySelector("button");
-      openBtn.addEventListener("click", () => {
-        window.location.href = `question.html?quizId=${quiz.id}`;
-      });
+    const openBtn = card.querySelector("button");
+    openBtn.addEventListener("click", () => {
+      window.location.href = `viewquiz.html?id=${quiz.id}`;
+    });
     });
   } catch (error) {
     console.error(error);

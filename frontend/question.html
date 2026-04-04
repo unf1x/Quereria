@@ -532,7 +532,7 @@
 
         async function loadQuiz() {
             try {
-                const response = await fetch(`http://localhost:8080/api/quizzes/${quizId}/play`);
+                const response = await fetch(`/api/quizzes/${quizId}/play`);
 
                 if (!response.ok) {
                     throw new Error("Не удалось загрузить квиз");
@@ -675,7 +675,7 @@
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/quizzes/${quizId}/submit`, {
+            const response = await fetch(`/api/quizzes/${quizId}/submit`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

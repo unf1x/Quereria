@@ -448,21 +448,21 @@
         </div>
 
         <div class="right">
-            <img class="quiz-image" src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/history_quiz.png" alt="quiz image">
+            <img class="quiz-image" src="img/history_quiz.png" alt="quiz image">
             <div class="author">
                 Автор: Чуракова Диана
             </div>
             <div class="link-block">
                 <input type="text" id="quizLink" value="https://quizter.com/quiz/123456" readonly>
                 <div class="copy-icon" id="copyLinkBtn" title="Копировать ссылку">
-                    <img id="linkIcon" src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/copy_link.png" alt="copy link">
+                    <img id="linkIcon" src="img/copy_link.png" alt="copy link">
                 </div>
             </div>
             <div class="code-block">
                 <span>Код подключения:</span>
                 <div class="code" id="quizCode">1234567</div>
                 <div class="code-copy-icon" id="copyCodeBtn" title="Копировать код">
-                    <img id="codeIcon" src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/copy_link.png" alt="copy code">
+                    <img id="codeIcon" src="img/copy_link.png" alt="copy code">
                 </div>
             </div>
         </div>
@@ -480,6 +480,14 @@
 <div class="toast" id="toast">Скопировано!</div>
 
 <script>
+    const params = new URLSearchParams(window.location.search);
+    const quizId = params.get('quizId');
+
+    if (!quizId) {
+        alert('Не найден id квиза');
+        window.location.href = 'index.html';
+    }
+
     // === ФУНКЦИЯ ЗАГРУЗКИ ИГРОКОВ ИЗ localStorage ===
     function loadPlayers() {
         const playersContainer = document.getElementById('playersList');
@@ -549,6 +557,19 @@
             toast.style.display = 'none';
         }, 2000);
     }
+
+    function fillQuizLinkAndCode() {
+    const quizLink = document.getElementById('quizLink');
+    const quizCode = document.getElementById('quizCode');
+
+    if (quizLink) {
+        quizLink.value = `${window.location.origin}/nickname.html?quizId=${quizId}`;
+    }
+
+    if (quizCode) {
+        quizCode.textContent = quizId;
+    }
+}
 
     // === ОБРАБОТЧИКИ КОПИРОВАНИЯ ===
     const copyLinkBtn = document.getElementById('copyLinkBtn');
@@ -627,9 +648,9 @@
     const startQuizBtn = document.getElementById('startQuizBtn');
     if (startQuizBtn) {
         startQuizBtn.addEventListener('click', () => {
-            window.location.href = 'question.html';
-        });
-    }
+    localStorage.setItem(`quiz_started_${quizId}`, 'true');
+    window.location.href = `question.html?quizId=${quizId}`;
+});
 
     // === КНОПКА "ВЫЙТИ" ===
     const exitQuizBtn = document.getElementById('exitQuizBtn');
@@ -644,6 +665,7 @@
         loadPlayers();
         setActiveMenuItem();
     });
+    fillQuizLinkAndCode();
 </script>
 </body>
 </html>

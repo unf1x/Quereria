@@ -264,27 +264,87 @@
             img.src = savedAvatar;
         }
 
+<script>
+    // Элементы
+    const avatarCircle = document.getElementById('avatarCircle');
+    const avatarInput = document.getElementById('avatarInput');
+    const avatarIcon = document.getElementById('avatarIcon');
+    const nicknameInput = document.getElementById('nickname');
+
+    // Загрузка фото
+    avatarCircle.addEventListener('click', () => {
+        avatarInput.click();
+    });
+
+    avatarInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                avatarIcon.style.display = 'none';
+                let img = avatarCircle.querySelector('img');
+                if (!img) {
+                    img = document.createElement('img');
+                    avatarCircle.appendChild(img);
+                }
+                img.src = ev.target.result;
+                localStorage.setItem('avatar', ev.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Восстановление аватара из localStorage при загрузке страницы
+    const savedAvatar = localStorage.getItem('avatar');
+    if (savedAvatar) {
+        avatarIcon.style.display = 'none';
+        let img = avatarCircle.querySelector('img');
+        if (!img) {
+            img = document.createElement('img');
+            avatarCircle.appendChild(img);
+        }
+        img.src = savedAvatar;
+    }
+
         // Кнопка подтверждения
         document.getElementById('confirmBtn').addEventListener('click', function() {
             const nickname = nicknameInput.value.trim() || 'Вася Пупкин';
-            // Группа не используется, можно передавать пустую или удалить
-            const selectedGroup = ''; // если нужно, можно добавить выбор группы обратно
+            const selectedGroup = '';
 
-            // Получаем текущий список игроков из localStorage
             let players = JSON.parse(localStorage.getItem('quizPlayers')) || [];
 
-            // Проверяем, нет ли уже такого игрока
             const exists = players.some(p => p.name === nickname && p.group === selectedGroup);
             if (!exists) {
-                // Сохраняем также аватар? Можно сохранить ссылку на фото в объекте игрока.
-                // Для простоты сохраняем только имя и группу, а аватар уже в отдельном ключе.
                 players.push({ name: nickname, group: selectedGroup });
                 localStorage.setItem('quizPlayers', JSON.stringify(players));
             }
 
-            // Переход на страницу quiz.html
-            window.location.href = 'waitingroom.html';
+            const params = new URLSearchParams(window.location.search);
+            const quizId = params.get('quizId');
+
+            if (!quizId) {
+                alert('Не найден id квиза');
+                return;
+            }
+
+            window.location.href = `waitingroom_participant.html?quizId=${quizId}`;
         });
+
+        // Желтый кружок (профиль)
+        document.getElementById('profileBtn').addEventListener('click', function() {
+            alert('Личный кабинет');
+        });
+
+        // Подсветка активного пункта меню
+        const navLinks = document.querySelectorAll('.nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        </script>
 
         // Желтый кружок (профиль) - переходит в личный кабинет (заглушка)
         document.getElementById('profileBtn').addEventListener('click', function() {
