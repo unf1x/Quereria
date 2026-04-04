@@ -280,7 +280,7 @@ finishBtn.addEventListener("click", function () {
     })
     .then(data => {
       alert("Квиз сохранён");
-      window.location.href = `viewquiz.html?id=${data.quizId}`;
+      window.location.href = `viewquiz.html?id=${data.id}`;
     })
     .catch(err => {
       console.error(err);

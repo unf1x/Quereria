@@ -301,7 +301,15 @@ function showFinalLeaderboard(){
 }
 
 // ===== КНОПКИ НОВЫЙ КВИЗ / ВЫХОД =====
-document.getElementById('newQuizBtn').onclick = () => {window.location.href='waitingroom.html';};
+document.getElementById('newQuizBtn').onclick = () => {
+    const params = new URLSearchParams(window.location.search);
+    const quizId = params.get('quizId');
+    if (quizId) {
+        window.location.href = `waitingroom_user.html?quizId=${quizId}`;
+    } else {
+        window.location.href = 'index.html';
+    }
+};
 document.getElementById('exitBtn').onclick = () => {window.location.href='index.html';};
 
 // ===== ЗАПУСК =====

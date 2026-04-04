@@ -386,12 +386,24 @@ public class QuizService {
                     if (question.getType().name().equals("OPEN")) {
                         String userTextAnswer = userAnswer != null ? userAnswer.getTextAnswer() : null;
 
+                        QuestionAnswerBond correctBond = bonds.stream()
+                                .filter(bond -> Boolean.TRUE.equals(bond.getIsCorrected()))
+                                .findFirst()
+                                .orElse(null);
+
+                        String correctAnswerText = correctBond != null ? correctBond.getAnswer().getText() : null;
+
+                        boolean isCorrect =
+                                userTextAnswer != null &&
+                                        correctAnswerText != null &&
+                                        userTextAnswer.trim().equalsIgnoreCase(correctAnswerText.trim());
+
                         return new QuestionResultResponse(
                                 question.getId(),
                                 question.getNumber(),
                                 question.getText(),
-                                false,
-                                null,
+                                isCorrect,
+                                correctAnswerText,
                                 userTextAnswer
                         );
                     }
