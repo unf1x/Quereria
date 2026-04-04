@@ -4,8 +4,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const profileBtn = document.getElementById('profileBtn');
 
     if (burger && menu) {
-        burger.addEventListener('click', () => {
+        burger.addEventListener('click', (e) => {
+            e.stopPropagation();
             menu.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!menu.contains(event.target) && !burger.contains(event.target)) {
+                menu.classList.remove('active');
+            }
         });
     }
 
@@ -13,9 +20,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.querySelectorAll('.menu-item').forEach(item => {
         const href = item.getAttribute('href');
-        if (href === currentPage) {
+        const dataPage = item.getAttribute('data-page');
+        const targetPage = href || dataPage;
+
+        if (targetPage === currentPage) {
             item.classList.add('active');
         }
+
+        item.addEventListener('click', () => {
+            if (menu) {
+                menu.classList.remove('active');
+            }
+        });
+    });
+
+    document.querySelectorAll('.logo, #logoBtn').forEach(logo => {
+        logo.style.cursor = 'pointer';
+        logo.addEventListener('click', () => {
+            window.location.href = 'mainpage.html';
+        });
     });
 
     if (profileBtn) {

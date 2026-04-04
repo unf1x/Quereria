@@ -532,7 +532,10 @@
 
         async function loadQuiz() {
             try {
-                const response = await fetch(`/api/quizzes/${quizId}/play`);
+                const response = await fetch(`/api/quizzes/${quizId}/play`, {
+                method: "GET",
+                credentials: "include"
+            });
 
                 if (!response.ok) {
                     throw new Error("Не удалось загрузить квиз");
@@ -680,6 +683,7 @@
                 headers: {
                     "Content-Type": "application/json"
                 },
+                credentials: "include",
                 body: JSON.stringify({
                     answers: collectedAnswers
                 })
@@ -759,5 +763,6 @@
         }
         loadQuiz();
     </script>
+    <script type="module" src="js/header.js"></script>
 </body>
 </html>

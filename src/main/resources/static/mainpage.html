@@ -506,86 +506,9 @@ if (searchButton) {
     });
 }
 
-// Функция для определения активной страницы и подсветки пункта меню
-function setActiveMenuItem() {
-    const currentPage = window.location.pathname.split("/").pop();
-    document.querySelectorAll('.menu-item').forEach(item => {
-        const itemPage = item.getAttribute('data-page');
-        if (itemPage === currentPage) {
-            item.classList.add('active');
-        } else {
-            item.classList.remove('active');
-        }
-    });
-}
 
-// БУРГЕР МЕНЮ (оставлено без изменений)
-const burger = document.getElementById('burger');
-const menuElement = document.getElementById('menu');
-
-if (burger && menuElement) {
-    burger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menuElement.classList.toggle('active');
-    });
-
-    // Закрытие меню при клике вне
-    document.addEventListener('click', (event) => {
-        if (!menuElement.contains(event.target) && !burger.contains(event.target)) {
-            menuElement.classList.remove('active');
-        }
-    });
-}
-
-// Меню - переход на страницы
-document.querySelectorAll('.menu-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-        e.preventDefault();
-        const page = item.getAttribute('data-page');
-        if (menuElement) menuElement.classList.remove('active');
-        window.location.href = page;
-    });
-});
-
-// КНОПКА ИГРЫ (alert оставлен, так как вы не просили его убирать)
-const startBtn = document.querySelector('.start-btn');
-const codeInput = document.querySelector('.code-input');
-
-if (startBtn && codeInput) {
-    startBtn.addEventListener('click', () => {
-        const code = codeInput.value.trim();
-        
-        if (code === '123456') {
-            alert('Код верный. Игра начинается');
-        } else if (code === '') {
-            alert('Введите код');
-        } else {
-            alert('Неверный код');
-        }
-    });
-}
-
-// КАРТОЧКИ - alert убран
-document.querySelectorAll('.card').forEach((card) => {
-    card.addEventListener('click', () => {
-        // alert убран
-        // Можно добавить любую другую логику здесь
-    });
-});
-
-// FOOTER ICONS - переход на help.html с прокруткой
-document.querySelectorAll('.icon').forEach((icon) => {
-    icon.addEventListener('click', () => {
-        const section = icon.getAttribute('data-section');
-        goToHelpSection(section);
-    });
-});
-
-
-// Подсвечиваем активный пункт меню при загрузке страницы
-setActiveMenuItem();
 
 </script>
-
+<script type="module" src="js/header.js"></script>
 </body>
 </html>

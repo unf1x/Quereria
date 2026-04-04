@@ -35,7 +35,7 @@ public class SecurityConfig {
                                 "/api/quizzes/*/play",
                                 "/api/quizzes/*"
                         ).permitAll()
-                        .requestMatchers("/api/auth/me", "/api/auth/logout", "/api/quizzes/history").authenticated()
+                        .requestMatchers("/api/auth/me", "/api/auth/logout", "/api/quizzes/history").permitAll()
                         .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults())
