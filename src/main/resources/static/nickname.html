@@ -258,6 +258,27 @@
             img.src = savedAvatar;
         }
 
+        (async function fillNicknameFromSession() {
+        try {
+            const response = await fetch('/api/auth/me', {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const user = await response.json();
+
+            if (!nicknameInput.value.trim()) {
+                nicknameInput.value = user.name || '';
+            }
+        } catch (e) {
+            console.error('Не удалось подставить имя пользователя', e);
+        }
+    })();
+
         document.getElementById('confirmBtn').addEventListener('click', function () {
             const nickname = nicknameInput.value.trim() || 'Вася Пупкин';
             const selectedGroup = '';
@@ -278,10 +299,31 @@
                 localStorage.setItem(`quizPlayers_${quizId}`, JSON.stringify(players));
             }
 
-            localStorage.setItem(`quizCurrentPlayer_${quizId}`, JSON.stringify({
+            let currentPlayerData = {
                 name: nickname,
                 group: selectedGroup
-            }));
+            };
+
+            try {
+                const response = await fetch('/api/auth/me', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    currentPlayerData = {
+                        name: nickname || user.name || 'Игрок',
+                        group: selectedGroup,
+                        userId: user.id,
+                        email: user.email
+                    };
+                }
+            } catch (e) {
+                console.error('Не удалось получить пользователя из сессии', e);
+            }
+
+            localStorage.setItem(`quizCurrentPlayer_${quizId}`, JSON.stringify(currentPlayerData));
 
             window.location.href = `waitingroom_participant.html?quizId=${quizId}`;
         });

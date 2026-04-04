@@ -504,7 +504,7 @@
         let questionTimerInterval = null;
         let collectedAnswers = [];
 
-        const currentPlayer = JSON.parse(localStorage.getItem(`quizCurrentPlayer_${quizId}`) || 'null');
+        let currentPlayer = JSON.parse(localStorage.getItem(`quizCurrentPlayer_${quizId}`) || 'null');
     const quizMeta = JSON.parse(localStorage.getItem(`quizMeta_${quizId}`) || 'null');
 
     function getLeaderboard() {
@@ -514,6 +514,34 @@
     function saveLeaderboard(data) {
         localStorage.setItem(`quizLeaderboard_${quizId}`, JSON.stringify(data));
     }
+    async function fillCurrentPlayerFromSession() {
+    if (currentPlayer?.name) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/auth/me', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const user = await response.json();
+
+        currentPlayer = {
+            name: user.name,
+            userId: user.id,
+            email: user.email
+        };
+
+        localStorage.setItem(`quizCurrentPlayer_${quizId}`, JSON.stringify(currentPlayer));
+    } catch (e) {
+        console.error('Не удалось получить пользователя из сессии', e);
+    }
+}
 
     function upsertCurrentPlayerScore(result) {
         const playerName = currentPlayer?.name || 'Игрок';
@@ -524,10 +552,16 @@
         const totalPoints = correctCount * 10;
 
         let leaderboard = getLeaderboard();
-        const existingIndex = leaderboard.findIndex(player => player.name === playerName);
+        const existingIndex = leaderboard.findIndex(player => {
+        if (currentPlayer?.userId && player.userId) {
+            return player.userId === currentPlayer.userId;
+        }
+        return player.name === playerName;
+    });
 
         const playerData = {
             name: playerName,
+            userId: currentPlayer?.userId ?? null,
             score: totalPoints,
             percent: result.scorePercent ?? 0
         };
@@ -549,32 +583,34 @@
             window.location.href = "index.html";
         }
 
-        async function loadQuiz() {
-            try {
-                const response = await fetch(`/api/quizzes/${quizId}/play`, {
+    async function loadQuiz() {
+        try {
+            await fillCurrentPlayerFromSession();
+
+            const response = await fetch(`/api/quizzes/${quizId}/play`, {
                 method: "GET",
                 credentials: "include"
             });
 
-                if (!response.ok) {
-                    throw new Error("Не удалось загрузить квиз");
-                }
+            if (!response.ok) {
+                throw new Error("Не удалось загрузить квиз");
+            }
 
-                quizData = await response.json();
+            quizData = await response.json();
 
-                if (!quizData.questions || !quizData.questions.length) {
-                    throw new Error("В квизе нет вопросов");
-                }
+            if (!quizData.questions || !quizData.questions.length) {
+                throw new Error("В квизе нет вопросов");
+            }
 
-                currentQuestionIndex = 0;
+            currentQuestionIndex = 0;
             currentQuestion = quizData.questions[currentQuestionIndex];
             renderQuestion(currentQuestion);
             startIntroTimer();
-            } catch (error) {
-                console.error(error);
-                alert("Ошибка загрузки квиза");
-            }
+        } catch (error) {
+            console.error(error);
+            alert("Ошибка загрузки квиза");
         }
+    }
 
         function startIntroTimer() {
             let timeLeft = 3;
@@ -758,7 +794,7 @@
                 row.innerHTML = `
                     <div class="rank">
                         <span class="rank-number">${index + 1}</span>
-                        <span class="rank-name">${player.name}${player.name === (currentPlayer?.name || '') ? ' (Вы)' : ''}</span>
+                        <span class="rank-name">${player.name}${((currentPlayer?.userId && player.userId === currentPlayer.userId) || (!currentPlayer?.userId && player.name === (currentPlayer?.name || ''))) ? ' (Вы)' : ''}</span>
                     </div>
                     <span class="rank-score">${player.score} баллов</span>
                 `;

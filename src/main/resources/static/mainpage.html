@@ -407,11 +407,11 @@ body {
 <div class="section-title">Популярные квизы</div>
 
 <div class="carousel" id="carousel">
-    <div class="card" data-quiz="Кинематография" style="background-image:url('img/cinematography.png')"></div>
-    <div class="card" data-quiz="Музыка" style="background-image:url('img/music.png')"></div>
-    <div class="card" data-quiz="География мира" style="background-image:url('img/geography.png')"></div>
-    <div class="card" data-quiz="Искусство" style="background-image:url('img/art.png')"></div>
-    <div class="card" data-quiz="Наука" style="background-image:url('img/science.png')"></div>
+    <div class="card" data-quiz-title="Кинематография" style="background-image:url('img/cinematography.png')"></div>
+    <div class="card" data-quiz-title="Музыка" style="background-image:url('img/music.png')"></div>
+    <div class="card" data-quiz-title="География мира" style="background-image:url('img/geography.png')"></div>
+    <div class="card" data-quiz-title="Искусство" style="background-image:url('img/art.png')"></div>
+    <div class="card" data-quiz-title="Наука" style="background-image:url('img/science.png')"></div>
 </div>
 
 <div class="footer">
@@ -506,7 +506,35 @@ if (searchButton) {
     });
 }
 
+async function openPopularQuizByTitle(title) {
+    try {
+        const response = await fetch('/api/quizzes');
 
+        if (!response.ok) {
+            throw new Error('Не удалось получить список квизов');
+        }
+
+        const quizzesFromApi = await response.json();
+        const quiz = quizzesFromApi.find(item => item.title === title);
+
+        if (!quiz) {
+            showSearchMessage(`Квиз "${title}" не найден`);
+            return;
+        }
+
+        window.location.href = `viewquiz.html?id=${quiz.id}`;
+    } catch (error) {
+        console.error(error);
+        showSearchMessage('Не удалось открыть квиз');
+    }
+}
+
+document.querySelectorAll('#carousel .card').forEach(card => {
+    card.addEventListener('click', () => {
+        const title = card.dataset.quizTitle;
+        openPopularQuizByTitle(title);
+    });
+});
 
 </script>
 <script type="module" src="js/header.js"></script>
