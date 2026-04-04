@@ -6,6 +6,9 @@ import com.project.Quereria.entity.User;
 import com.project.Quereria.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.project.Quereria.dto.request.LoginRequest;
+import com.project.Quereria.dto.response.LoginResponse;
+import com.project.Quereria.entity.User;
 
 @Service
 @RequiredArgsConstructor
@@ -46,5 +49,33 @@ public class AuthService {
 
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
+    }
+
+    public LoginResponse login(LoginRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Тело запроса отсутствует");
+        }
+
+        if (isBlank(request.getEmail()) || isBlank(request.getPassword())) {
+            throw new IllegalArgumentException("Email и пароль обязательны");
+        }
+
+        String email = request.getEmail().trim().toLowerCase();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+
+        String password = request.getPassword().trim();
+
+        if (!user.getPassword().equals(password)) {
+            throw new IllegalArgumentException("Неверный пароль");
+        }
+
+        return new LoginResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                "Вход выполнен успешно"
+        );
     }
 }

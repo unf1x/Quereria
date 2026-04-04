@@ -6,6 +6,9 @@ import com.project.Quereria.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.project.Quereria.dto.request.LoginRequest;
+import com.project.Quereria.dto.response.LoginResponse;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -17,5 +20,10 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 }
