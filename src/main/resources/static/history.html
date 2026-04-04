@@ -36,7 +36,6 @@
     <h1>История</h1>
     <div id="history-list" class="quiz-list"></div>
 </main>
-    <script src="js/header.js" type="module"></script>
 <script>
     async function loadHistory() {
       const container = document.getElementById("history-list");
@@ -76,7 +75,7 @@
           `;
 
           card.querySelector("button").addEventListener("click", () => {
-            window.location.href = \`viewquiz.html?id=\${item.quizId}\`;
+            window.location.href = `viewquiz.html?id=${item.quizId}`;
           });
 
           container.appendChild(card);
