@@ -216,7 +216,7 @@
             <input type="text" class="input-field" id="nickname" placeholder="Вася Пупкин" value="">
         </div>
 
-        <button class="confirm-btn" id="confirmBtn">Подтвердить</button>
+        <button type="button" class="confirm-btn" id="confirmBtn">Подтвердить</button>
     </div>
 
     <script>
@@ -279,53 +279,58 @@
         }
     })();
 
-        document.getElementById('confirmBtn').addEventListener('click', function () {
-            const nickname = nicknameInput.value.trim() || 'Вася Пупкин';
-            const selectedGroup = '';
-
-            const params = new URLSearchParams(window.location.search);
-            const quizId = params.get('quizId');
-
-            if (!quizId) {
-                alert('Не найден id квиза');
-                return;
-            }
-
-            let players = JSON.parse(localStorage.getItem(`quizPlayers_${quizId}`)) || [];
-
-            const exists = players.some(p => p.name === nickname && p.group === selectedGroup);
-            if (!exists) {
-                players.push({ name: nickname, group: selectedGroup });
-                localStorage.setItem(`quizPlayers_${quizId}`, JSON.stringify(players));
-            }
-
-            let currentPlayerData = {
-                name: nickname,
-                group: selectedGroup
-            };
-
+        function handleNicknameConfirm() {
             try {
-                const response = await fetch('/api/auth/me', {
-                    method: 'GET',
-                    credentials: 'include'
-                });
+                const nickname = nicknameInput.value.trim() || 'Вася Пупкин';
+                const selectedGroup = '';
 
-                if (response.ok) {
-                    const user = await response.json();
-                    currentPlayerData = {
-                        name: nickname || user.name || 'Игрок',
-                        group: selectedGroup,
-                        userId: user.id,
-                        email: user.email
-                    };
+                const params = new URLSearchParams(window.location.search);
+                const quizId = params.get('quizId');
+
+                if (!quizId) {
+                    alert('Не найден id квиза');
+                    return;
                 }
-            } catch (e) {
-                console.error('Не удалось получить пользователя из сессии', e);
+
+                const rawPlayers = localStorage.getItem(`quizPlayers_${quizId}`);
+                let players = [];
+
+                if (rawPlayers) {
+                    try {
+                        players = JSON.parse(rawPlayers) || [];
+                    } catch (e) {
+                        players = [];
+                    }
+                }
+
+                const exists = players.some(p => p.name === nickname && p.group === selectedGroup);
+
+                if (!exists) {
+                    players.push({
+                        name: nickname,
+                        group: selectedGroup
+                    });
+                    localStorage.setItem(`quizPlayers_${quizId}`, JSON.stringify(players));
+                }
+
+                localStorage.setItem(`quizCurrentPlayer_${quizId}`, JSON.stringify({
+                    name: nickname,
+                    group: selectedGroup
+                }));
+
+                window.location.assign(`waitingroom_participant.html?quizId=${quizId}`);
+            } catch (error) {
+                console.error('Ошибка при подтверждении никнейма:', error);
+                alert('Не удалось перейти в комнату ожидания');
             }
+        }
 
-            localStorage.setItem(`quizCurrentPlayer_${quizId}`, JSON.stringify(currentPlayerData));
+        document.getElementById('confirmBtn').addEventListener('click', handleNicknameConfirm);
 
-            window.location.href = `waitingroom_participant.html?quizId=${quizId}`;
+        nicknameInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                handleNicknameConfirm();
+            }
         });
 
         document.getElementById('profileBtn').addEventListener('click', function () {

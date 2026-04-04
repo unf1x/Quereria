@@ -392,8 +392,8 @@ body {
 <h1 class="title">Приветствуем в Квизтерре!</h1>
 
 <div class="actions">
-    <button class="start-btn">Начать игру</button>
-    <input class="code-input" placeholder="Введите код 123456">
+    <button class="start-btn" id="joinQuizBtn">Начать игру</button>
+    <input class="code-input" id="quizCodeInput" placeholder="Введите код 123456">
 </div>
 
 <div class="search-container">
@@ -413,7 +413,6 @@ body {
     <div class="card" data-quiz-title="Искусство" style="background-image:url('img/art.png')"></div>
     <div class="card" data-quiz-title="Наука" style="background-image:url('img/science.png')"></div>
 </div>
-
 <div class="footer">
     <div class="icon" data-section="us"><img src="img/user.png" alt="User"></div>
     <div class="icon" data-section="email"><img src="img/email.png" alt="Email"></div>
@@ -424,118 +423,184 @@ body {
 </div>
 
 <script>
-// Функция для перехода на страницу help.html с прокруткой к нужному разделу
-function goToHelpSection(sectionId) {
-    // Сохраняем в localStorage информацию о том, к какому разделу нужно прокрутить
-    localStorage.setItem('scrollToSection', sectionId);
-    window.location.href = 'help.html';
-}
-
-// База данных квизов для поиска
-const quizzes = [
-    "Киномания",
-    "Музыкальный баттл",
-    "География мира",
-    "Наука и факты",
-    "История искусства",
-    "СпортQuiz",
-    "IT и технологии",
-    "Литература"
-];
-
-// Функция поиска
-function searchQuizzes(query) {
-    if (!query.trim()) {
-        return [];
+    function goToHelpSection(sectionId) {
+        localStorage.setItem('scrollToSection', sectionId);
+        window.location.href = 'help.html';
     }
-    
-    const lowerQuery = query.toLowerCase();
-    return quizzes.filter(quiz => quiz.toLowerCase().includes(lowerQuery));
-}
 
-// Отображение сообщения
-function showSearchMessage(message) {
-    const messageContainer = document.getElementById('searchMessage');
-    if (messageContainer) {
-        messageContainer.textContent = message;
-        messageContainer.classList.add('active');
-        
-        setTimeout(() => {
-            messageContainer.classList.remove('active');
-        }, 2000);
+    function showSearchMessage(message) {
+        const messageContainer = document.getElementById('searchMessage');
+        if (messageContainer) {
+            messageContainer.textContent = message;
+            messageContainer.classList.add('active');
+
+            setTimeout(() => {
+                messageContainer.classList.remove('active');
+            }, 2000);
+        }
     }
-}
 
-// Обработка ввода в поле поиска
-const searchInput = document.querySelector('.search-input');
-if (searchInput) {
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const query = searchInput.value.trim();
-            if (query) {
-                const results = searchQuizzes(query);
-                if (results.length > 0) {
-                    // alert убран
-                    searchInput.value = '';
-                } else {
-                    showSearchMessage('Ничего не найдено');
-                }
-            } else {
-                showSearchMessage('Введите запрос для поиска');
-            }
-        }
-    });
-}
-
-// Обработка кнопки поиска
-const searchButton = document.querySelector('.search-button');
-if (searchButton) {
-    searchButton.addEventListener('click', () => {
-        const query = searchInput ? searchInput.value.trim() : '';
-        if (query) {
-            const results = searchQuizzes(query);
-            if (results.length > 0) {
-                // alert убран
-                if (searchInput) searchInput.value = '';
-            } else {
-                showSearchMessage('Ничего не найдено');
-            }
-        } else {
-            showSearchMessage('Введите запрос для поиска');
-        }
-    });
-}
-
-async function openPopularQuizByTitle(title) {
-    try {
-        const response = await fetch('/api/quizzes');
+    async function fetchAllQuizzes() {
+        const response = await fetch('/api/quizzes', {
+            method: 'GET',
+            credentials: 'include'
+        });
 
         if (!response.ok) {
             throw new Error('Не удалось получить список квизов');
         }
 
-        const quizzesFromApi = await response.json();
-        const quiz = quizzesFromApi.find(item => item.title === title);
+        return await response.json();
+    }
 
-        if (!quiz) {
-            showSearchMessage(`Квиз "${title}" не найден`);
+    async function openQuizByCode(rawCode) {
+        const quizCode = String(rawCode || '').trim();
+
+        if (!quizCode) {
+            showSearchMessage('Введите код квиза');
             return;
         }
 
-        window.location.href = `viewquiz.html?id=${quiz.id}`;
-    } catch (error) {
-        console.error(error);
-        showSearchMessage('Не удалось открыть квиз');
+        if (!/^\d+$/.test(quizCode)) {
+            showSearchMessage('Код квиза должен состоять из цифр');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/quizzes/${quizCode}/full`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                showSearchMessage('Квиз с таким кодом не найден');
+                return;
+            }
+
+            window.location.href = `nickname.html?quizId=${quizCode}`;
+        } catch (error) {
+            console.error(error);
+            showSearchMessage('Не удалось начать игру');
+        }
     }
-}
 
-document.querySelectorAll('#carousel .card').forEach(card => {
-    card.addEventListener('click', () => {
-        const title = card.dataset.quizTitle;
-        openPopularQuizByTitle(title);
+    async function openPopularQuizByTitle(title) {
+        try {
+            const quizzes = await fetchAllQuizzes();
+            const quiz = quizzes.find(item => item.title === title);
+
+            if (!quiz) {
+                showSearchMessage(`Квиз "${title}" не найден`);
+                return;
+            }
+
+            window.location.href = `viewquiz.html?id=${quiz.id}`;
+        } catch (error) {
+            console.error(error);
+            showSearchMessage('Не удалось открыть квиз');
+        }
+    }
+
+    async function searchQuizzes(query) {
+        const normalizedQuery = query.trim().toLowerCase();
+
+        if (!normalizedQuery) {
+            return [];
+        }
+
+        const quizzes = await fetchAllQuizzes();
+        return quizzes.filter(quiz =>
+            (quiz.title || '').toLowerCase().includes(normalizedQuery)
+        );
+    }
+
+    const searchInput = document.querySelector('.search-input');
+    const searchButton = document.querySelector('.search-button');
+    const joinQuizBtn = document.getElementById('joinQuizBtn');
+    const quizCodeInput = document.getElementById('quizCodeInput');
+
+    if (quizCodeInput) {
+        quizCodeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                openQuizByCode(quizCodeInput.value);
+            }
+        });
+    }
+
+    if (joinQuizBtn) {
+        joinQuizBtn.addEventListener('click', () => {
+            openQuizByCode(quizCodeInput ? quizCodeInput.value : '');
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+
+                if (!query) {
+                    showSearchMessage('Введите запрос для поиска');
+                    return;
+                }
+
+                try {
+                    const results = await searchQuizzes(query);
+
+                    if (results.length === 1) {
+                        window.location.href = `viewquiz.html?id=${results[0].id}`;
+                        return;
+                    }
+
+                    if (results.length > 1) {
+                        window.location.href = `viewquiz.html?id=${results[0].id}`;
+                        return;
+                    }
+
+                    showSearchMessage('Ничего не найдено');
+                } catch (error) {
+                    console.error(error);
+                    showSearchMessage('Ошибка поиска квизов');
+                }
+            }
+        });
+    }
+
+    if (searchButton) {
+        searchButton.addEventListener('click', async () => {
+            const query = searchInput ? searchInput.value.trim() : '';
+
+            if (!query) {
+                showSearchMessage('Введите запрос для поиска');
+                return;
+            }
+
+            try {
+                const results = await searchQuizzes(query);
+
+                if (results.length === 1) {
+                    window.location.href = `viewquiz.html?id=${results[0].id}`;
+                    return;
+                }
+
+                if (results.length > 1) {
+                    window.location.href = `viewquiz.html?id=${results[0].id}`;
+                    return;
+                }
+
+                showSearchMessage('Ничего не найдено');
+            } catch (error) {
+                console.error(error);
+                showSearchMessage('Ошибка поиска квизов');
+            }
+        });
+    }
+
+    document.querySelectorAll('#carousel .card').forEach(card => {
+        card.addEventListener('click', () => {
+            const title = card.dataset.quizTitle;
+            openPopularQuizByTitle(title);
+        });
     });
-});
-
 </script>
 <script type="module" src="js/header.js"></script>
 </body>
