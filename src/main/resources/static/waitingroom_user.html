@@ -557,19 +557,57 @@
             toast.style.display = 'none';
         }, 2000);
     }
+    async function fillQuizLinkAndCode() {
+        const quizLink = document.getElementById('quizLink');
+        const quizCode = document.getElementById('quizCode');
 
-    function fillQuizLinkAndCode() {
-    const quizLink = document.getElementById('quizLink');
-    const quizCode = document.getElementById('quizCode');
+        if (quizLink) {
+            quizLink.value = `${window.location.origin}/nickname.html?quizId=${quizId}`;
+        }
 
-    if (quizLink) {
-        quizLink.value = `${window.location.origin}/nickname.html?quizId=${quizId}`;
+        if (quizCode) {
+            quizCode.textContent = quizId;
+        }
+
+        try {
+            const response = await fetch(`/api/quizzes/${quizId}/full`, {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error("Не удалось загрузить квиз");
+            }
+
+            const quiz = await response.json();
+
+            const titleEl = document.querySelector('.quiz-info h2');
+            const infoParagraphs = document.querySelectorAll('.quiz-info p');
+            const authorEl = document.querySelector('.author');
+
+            if (titleEl) {
+                titleEl.textContent = quiz.title || 'Без названия';
+            }
+
+            if (infoParagraphs[0]) {
+                infoParagraphs[0].textContent = quiz.description || 'Без описания';
+            }
+
+            if (authorEl) {
+                authorEl.textContent = `Автор: ${quiz.authorName || 'Не указан'}`;
+            }
+
+            localStorage.setItem(`quizMeta_${quizId}`, JSON.stringify({
+                title: quiz.title || 'Без названия',
+                description: quiz.description || 'Без описания',
+                authorName: quiz.authorName || 'Не указан',
+                inviteLink: `${window.location.origin}/nickname.html?quizId=${quizId}`,
+                inviteCode: String(quizId)
+            }));
+        } catch (error) {
+            console.error(error);
+        }
     }
-
-    if (quizCode) {
-        quizCode.textContent = quizId;
-    }
-}
 
     // === ОБРАБОТЧИКИ КОПИРОВАНИЯ ===
     const copyLinkBtn = document.getElementById('copyLinkBtn');
@@ -661,12 +699,11 @@
         });
     }
 
-    // === ЗАГРУЗКА СТРАНИЦЫ ===
-    document.addEventListener('DOMContentLoaded', function() {
-        loadPlayers();
-        setActiveMenuItem();
-    });
-    fillQuizLinkAndCode();
+    document.addEventListener('DOMContentLoaded', async function() {
+    loadPlayers();
+    setActiveMenuItem();
+    await fillQuizLinkAndCode();
+});
 </script>
 <script type="module" src="js/header.js"></script>
 </body>

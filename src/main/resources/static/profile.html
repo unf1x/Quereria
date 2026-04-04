@@ -696,6 +696,7 @@
             </div>
 
             <button class="edit-btn" id="editBtn" onclick="toggleEdit()">Редактировать</button>
+            <button class="edit-btn" style="margin-top: 15px;" onclick="openLogoutModal()">Выйти</button>
         </div>
 
         <!-- ПРАВАЯ ЧАСТЬ -->
@@ -1113,9 +1114,26 @@
         alert("Настройки в разработке");
     }
 
-    function logout() {
-        window.location.href = "mainpage.html";
+function openSettings() {
+    alert("Настройки в разработке");
+}
+
+async function logout() {
+    try {
+        await fetch("/api/auth/logout", {
+            method: "POST",
+            credentials: "include"
+        });
+    } catch (e) {
+        console.error("Ошибка при выходе из аккаунта", e);
+    } finally {
+        window.location.href = "login.html";
     }
+}
+
+function goToMainPage() {
+    window.location.href = "mainpage.html";
+}
 
     function goToMainPage() {
         window.location.href = "mainpage.html";

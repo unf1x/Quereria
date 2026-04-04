@@ -501,13 +501,30 @@
     function fillParticipantQuizInfo() {
     const quizLink = document.getElementById('quizLink');
     const quizCode = document.getElementById('quizCode');
+    const savedMeta = JSON.parse(localStorage.getItem(`quizMeta_${quizId}`) || 'null');
 
     if (quizLink) {
-        quizLink.value = `${window.location.origin}/nickname.html?quizId=${quizId}`;
+        quizLink.value = savedMeta?.inviteLink || `${window.location.origin}/nickname.html?quizId=${quizId}`;
     }
 
     if (quizCode) {
-        quizCode.textContent = quizId;
+        quizCode.textContent = savedMeta?.inviteCode || quizId;
+    }
+
+    const titleEl = document.querySelector('.quiz-info h2');
+    const infoParagraphs = document.querySelectorAll('.quiz-info p');
+    const authorEl = document.querySelector('.author');
+
+    if (titleEl) {
+        titleEl.textContent = savedMeta?.title || 'Квиз';
+    }
+
+    if (infoParagraphs[0]) {
+        infoParagraphs[0].textContent = savedMeta?.description || 'Описание отсутствует';
+    }
+
+    if (authorEl) {
+        authorEl.textContent = `Автор: ${savedMeta?.authorName || 'Не указан'}`;
     }
 }
 

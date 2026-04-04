@@ -262,6 +262,14 @@
             const nickname = nicknameInput.value.trim() || 'Вася Пупкин';
             const selectedGroup = '';
 
+            const params = new URLSearchParams(window.location.search);
+            const quizId = params.get('quizId');
+
+            if (!quizId) {
+                alert('Не найден id квиза');
+                return;
+            }
+
             let players = JSON.parse(localStorage.getItem(`quizPlayers_${quizId}`)) || [];
 
             const exists = players.some(p => p.name === nickname && p.group === selectedGroup);
@@ -270,13 +278,10 @@
                 localStorage.setItem(`quizPlayers_${quizId}`, JSON.stringify(players));
             }
 
-            const params = new URLSearchParams(window.location.search);
-            const quizId = params.get('quizId');
-
-            if (!quizId) {
-                alert('Не найден id квиза');
-                return;
-            }
+            localStorage.setItem(`quizCurrentPlayer_${quizId}`, JSON.stringify({
+                name: nickname,
+                group: selectedGroup
+            }));
 
             window.location.href = `waitingroom_participant.html?quizId=${quizId}`;
         });

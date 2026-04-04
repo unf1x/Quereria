@@ -473,39 +473,18 @@
         </div>
         <!-- Подтягивается из введенной информации о квизе -->
         <div class="rating-container">
-            <h1 class="rating-title">Исторический батл</h1>
-            
+            <h1 class="rating-title">Результаты квиза</h1>
+
             <div class="correct-answer-section">
-                <div class="correct-answer-label">Правильный ответ:</div>
-                <div class="correct-answer-value">Октавиан Август</div>
+                <div class="correct-answer-label">Ваш результат:</div>
+                <div class="correct-answer-value">0%</div>
             </div>
 
-            <h2 class="leaderboard-title">Таблица лидеров</h2>
-            
-            <div class="leaderboard-list">
-                <div class="leaderboard-item first">
-                    <div class="rank">
-                        <span class="rank-number">1</span>
-                        <span class="rank-name">МурМур (Я)</span>
-                    </div>
-                    <span class="rank-score">30</span>
-                </div>
-                <div class="leaderboard-item">
-                    <div class="rank">
-                        <span class="rank-number">2</span>
-                        <span class="rank-name">Ягуар</span>
-                    </div>
-                    <span class="rank-score">20</span>
-                </div>
-                <div class="leaderboard-item">
-                    <div class="rank">
-                        <span class="rank-number">3</span>
-                        <span class="rank-name">Панда</span>
-                    </div>
-                    <span class="rank-score">0</span>
-                </div>
-            </div>
-        </div>
+            <h2 class="leaderboard-title">Рейтинг игроков</h2>
+            <div class="leaderboard-list"></div>
+
+            <h2 class="leaderboard-title" style="margin-top: 35px;">Баллы за ответы</h2>
+            <div class="leaderboard-list" id="answerDetailsList"></div>
     </div>
     <script>
         const timerPage = document.getElementById('timerPage');
@@ -524,6 +503,46 @@
         let currentQuestion = null;
         let questionTimerInterval = null;
         let collectedAnswers = [];
+
+        const currentPlayer = JSON.parse(localStorage.getItem(`quizCurrentPlayer_${quizId}`) || 'null');
+    const quizMeta = JSON.parse(localStorage.getItem(`quizMeta_${quizId}`) || 'null');
+
+    function getLeaderboard() {
+        return JSON.parse(localStorage.getItem(`quizLeaderboard_${quizId}`) || '[]');
+    }
+
+    function saveLeaderboard(data) {
+        localStorage.setItem(`quizLeaderboard_${quizId}`, JSON.stringify(data));
+    }
+
+    function upsertCurrentPlayerScore(result) {
+        const playerName = currentPlayer?.name || 'Игрок';
+        const correctCount = Array.isArray(result.results)
+            ? result.results.filter(item => item.correct).length
+            : 0;
+
+        const totalPoints = correctCount * 10;
+
+        let leaderboard = getLeaderboard();
+        const existingIndex = leaderboard.findIndex(player => player.name === playerName);
+
+        const playerData = {
+            name: playerName,
+            score: totalPoints,
+            percent: result.scorePercent ?? 0
+        };
+
+        if (existingIndex >= 0) {
+            leaderboard[existingIndex] = playerData;
+        } else {
+            leaderboard.push(playerData);
+        }
+
+        leaderboard.sort((a, b) => b.score - a.score);
+        saveLeaderboard(leaderboard);
+
+        return leaderboard;
+    }
 
         if (!quizId) {
             alert("quizId не найден в URL");
@@ -702,49 +721,72 @@
         }
     }
 
-        function showResult(result) {
-            questionPage.style.display = 'none';
-            ratingPage.style.display = 'block';
+    function showResult(result) {
+        questionPage.style.display = 'none';
+        ratingPage.style.display = 'block';
 
-            const ratingTitle = document.querySelector('.rating-title');
-            const correctAnswerLabel = document.querySelector('.correct-answer-label');
-            const correctAnswerValue = document.querySelector('.correct-answer-value');
-            const leaderboardTitle = document.querySelector('.leaderboard-title');
-            const leaderboardList = document.querySelector('.leaderboard-list');
+        const ratingTitle = document.querySelector('.rating-title');
+        const correctAnswerLabel = document.querySelector('.correct-answer-label');
+        const correctAnswerValue = document.querySelector('.correct-answer-value');
+        const leaderboardList = document.querySelector('.leaderboard-list');
+        const answerDetailsList = document.getElementById('answerDetailsList');
 
-            if (ratingTitle) {
-                ratingTitle.textContent = quizData.title || "Результат";
-            }
+        const leaderboard = upsertCurrentPlayerScore(result);
 
-            if (correctAnswerLabel) {
-                correctAnswerLabel.textContent = "Ваш результат:";
-            }
-
-            if (correctAnswerValue) {
-                correctAnswerValue.textContent = `${result.scorePercent}%`;
-            }
-
-            if (leaderboardTitle) {
-                leaderboardTitle.textContent = "Детали";
-            }
-
-            if (leaderboardList) {
-                leaderboardList.innerHTML = "";
-
-                result.results.forEach(item => {
-                    const row = document.createElement("div");
-                    row.className = "leaderboard-item";
-                    row.innerHTML = `
-                        <div class="rank">
-                            <span class="rank-number">${item.questionNumber}</span>
-                            <span class="rank-name">${item.questionText}</span>
-                        </div>
-                        <span class="rank-score">${item.correct ? "✔" : "✖"}</span>
-                    `;
-                    leaderboardList.appendChild(row);
-                });
-            }
+        if (ratingTitle) {
+            ratingTitle.textContent = quizMeta?.title || quizData.title || "Результаты квиза";
         }
+
+        if (correctAnswerLabel) {
+            correctAnswerLabel.textContent = `Ваш результат (${currentPlayer?.name || 'Игрок'}):`;
+        }
+
+        if (correctAnswerValue) {
+            correctAnswerValue.textContent = `${result.scorePercent}%`;
+        }
+
+        if (leaderboardList) {
+            leaderboardList.innerHTML = "";
+
+            leaderboard.forEach((player, index) => {
+                const row = document.createElement("div");
+                row.className = "leaderboard-item";
+                if (index === 0) {
+                    row.classList.add("first");
+                }
+
+                row.innerHTML = `
+                    <div class="rank">
+                        <span class="rank-number">${index + 1}</span>
+                        <span class="rank-name">${player.name}${player.name === (currentPlayer?.name || '') ? ' (Вы)' : ''}</span>
+                    </div>
+                    <span class="rank-score">${player.score} баллов</span>
+                `;
+
+                leaderboardList.appendChild(row);
+            });
+        }
+
+        if (answerDetailsList) {
+            answerDetailsList.innerHTML = "";
+
+            result.results.forEach(item => {
+                const points = item.correct ? 10 : 0;
+
+                const row = document.createElement("div");
+                row.className = "leaderboard-item";
+                row.innerHTML = `
+                    <div class="rank">
+                        <span class="rank-number">${item.questionNumber}</span>
+                        <span class="rank-name">${item.questionText}</span>
+                    </div>
+                    <span class="rank-score">${points}</span>
+                `;
+
+                answerDetailsList.appendChild(row);
+            });
+        }
+    }
 
         submitBtn.addEventListener("click", submitCurrentAnswer);
 
