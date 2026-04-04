@@ -657,8 +657,8 @@
             <input type="file" id="avatarUpload" hidden accept="image/*">
         </div>
 
-        <h2 id="fullName">Бойко Маргарита</h2>
-        <p id="userId">id 6803945</p>
+        <h2 id="fullName">Загрузка...</h2>
+        <p id="userId">id —</p>
     </div>
 
     <!-- КОНТЕЙНЕР ДЛЯ ЛЕВОЙ И ПРАВОЙ ЧАСТИ -->
@@ -668,7 +668,7 @@
         <div class="left-part">
             <div class="info">
                 <div class="info-row">
-                    <p>Никнейм: <span id="nickname">Марго</span></p>
+                    <p>Никнейм: <span id="nickname">—</span></p>
                 </div>
 
                 <div class="info-row">
@@ -684,7 +684,7 @@
                 </div>
 
                 <div class="info-row">
-                    <p>E-mail: <span id="email">mail@mail.ru</span></p>
+                    <p>E-mail: <span id="email">—</span></p>
                 </div>
 
                 <div class="info-row">
@@ -1146,10 +1146,15 @@
 
             const user = await response.json();
 
-            const nameEl = document.querySelector('.user-name, #userName, h1');
-            if (nameEl && user.name) {
-                nameEl.textContent = user.name;
-            }
+        const fullNameEl = document.getElementById('fullName');
+        const nicknameEl = document.getElementById('nickname');
+        const emailEl = document.getElementById('email');
+        const userIdEl = document.getElementById('userId');
+
+        if (fullNameEl) fullNameEl.textContent = user.name || 'Без имени';
+        if (nicknameEl) nicknameEl.textContent = user.name || '—';
+        if (emailEl) emailEl.textContent = user.email || '—';
+        if (userIdEl) userIdEl.textContent = `id ${user.id}`;
         } catch (e) {
             window.location.href = 'login.html';
         }

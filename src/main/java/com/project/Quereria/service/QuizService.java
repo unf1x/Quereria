@@ -310,8 +310,12 @@ public class QuizService {
                 ))
                 .toList();
     }
-    public List<HistoryItemResponse> getHistory() {
-        return resultRepository.findAllByOrderByCreatedAtDesc().stream()
+    public List<HistoryItemResponse> getHistory(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("Пользователь не авторизован");
+        }
+
+        return resultRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(result -> new HistoryItemResponse(
                         result.getId(),
                         result.getQuiz().getId(),
@@ -322,7 +326,7 @@ public class QuizService {
                 .toList();
     }
 
-    public QuizSubmitResponse submitQuiz(Long quizId, QuizSubmitRequest request) {
+    public QuizSubmitResponse submitQuiz(Long quizId, QuizSubmitRequest request, Long currentUserId) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new IllegalArgumentException("Квиз не найден: " + quizId));
 
@@ -439,7 +443,7 @@ public class QuizService {
         resultRepository.save(
                 Result.builder()
                         .score(scorePercent)
-                        .userId(request != null ? request.getUserId() : null)
+                        .userId(currentUserId)
                         .quiz(quiz)
                         .createdAt(LocalDateTime.now())
                         .build()

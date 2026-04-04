@@ -26,15 +26,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (response.ok) {
+                const user = await response.json();
+                profileBtn.textContent = user.name || 'Профиль';
                 profileBtn.addEventListener('click', () => {
                     window.location.href = 'profile.html';
                 });
             } else {
+                profileBtn.textContent = 'Регистрация/вход';
                 profileBtn.addEventListener('click', () => {
                     window.location.href = 'login.html';
                 });
             }
         } catch (e) {
+            profileBtn.textContent = 'Регистрация/вход';
             profileBtn.addEventListener('click', () => {
                 window.location.href = 'login.html';
             });

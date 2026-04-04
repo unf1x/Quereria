@@ -36,7 +36,6 @@
     <h1>История</h1>
     <div id="history-list" class="quiz-list"></div>
 </main>
-  <script type="module" src="js/main.js"></script>
     <script src="js/header.js" type="module"></script>
 <script>
     async function loadHistory() {
@@ -44,7 +43,10 @@
       container.innerHTML = "<p>Загрузка...</p>";
 
       try {
-        const response = await fetch("/api/quizzes/history");
+        const response = await fetch("/api/quizzes/history", {
+          method: "GET",
+          credentials: "include"
+});
 
         if (!response.ok) {
           throw new Error("Не удалось загрузить историю");
