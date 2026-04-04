@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Помощь</title>
+
+    <!-- ШРИФТЫ -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rufina:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat Alternates', sans-serif;
+}
+
+body {
+    background: #f5f5f5;
+}
+
+/* КОНТЕЙНЕР */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ===== HEADER & BURGER MENU ===== */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.logo {
+    font-family: 'Rufina', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+}
+
+.left-block {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.burger {
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: 0.3s;
+}
+
+.burger span {
+    position: absolute;
+    width: 30px;
+    height: 3px;
+    background: black;
+    border-radius: 2px;
+}
+
+.burger span:nth-child(1) { transform: translateY(-8px); }
+.burger span:nth-child(2) { transform: translateY(0); }
+.burger span:nth-child(3) { transform: translateY(8px); }
+
+.burger:hover {
+    background: #700143;
+}
+
+/* ВЫПАДАЮЩЕЕ МЕНЮ */
+.menu {
+    position: absolute;
+    left: 20%;
+    transform: translate(20px, -50%); /* 20px отступ вправо, центрируем по вертикали */
+    background: white;
+    padding: 20px 40px;
+    border-radius: 50px;
+    display: flex;
+    gap: 60px;
+
+    opacity: 0;
+    transform: translateX(-50px);
+    pointer-events: none;
+
+    transition: 0.4s ease;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.66);
+    z-index: 999;
+}
+
+.menu.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.menu-item {
+    text-decoration: none;
+    color: black;
+    font-size: 22px;
+    font-weight: 500;
+    position: relative;
+}
+
+.menu-item::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0%;
+    height: 4px;
+    background: #f2e46c;
+    transition: 0.4s;
+}
+
+.menu-item:hover::after,
+.menu-item.active::after {
+    width: 100%;
+}
+
+.profile {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e9dc6a;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.profile:hover {
+    transform: scale(1.05);
+}
+
+/* PROFILE */
+.profile-btn {
+    background: #e0e0e0;
+    padding: 0px 108px;
+    border-radius: 35px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: 500;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.profile-btn:hover {
+    background: #700143;
+    color: white;
+}
+
+        /* КАПСУЛА ДЛЯ ШАПКИ (остальные стили из help) */
+        /* КОНТЕНТ */
+        .container {
+            width: 100%;
+            padding: 0 40px;
+        }
+
+        /* ЗАГОЛОВКИ — КРУПНЕЕ */
+        h1, h2 {
+            text-align: center;
+            margin: 40px 0 20px;
+            font-size: 34px;
+            font-weight: 600;
+        }
+
+        /* КАРТОЧКИ — КРУПНЕЕ ТЕКСТ */
+        .card {
+            width: 100%;
+            background: #F7EB77;
+            padding: 40px;
+            border-radius: 25px;
+            margin-bottom: 30px;
+            font-size: 24px;
+            line-height: 1.8;
+        }
+
+        .card p {
+            font-size: 24px;
+        }
+
+        .card.big p {
+            font-size: 24px;
+        }
+
+        /* FOOTER */
+        .footer {
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .footer h2 {
+            font-size: 36px;
+            margin-bottom: 50px;
+        }
+
+        /* Сетка команды: 2 строки по 3 фотографии */
+        .team {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 50px;
+        }
+
+        .team-member {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+            min-width: 200px;
+        }
+
+        /* Фото разработчика */
+        .dev-photo {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #5a0f2e;
+            margin-bottom: 15px;
+            transition: transform 0.3s;
+        }
+
+        .dev-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dev-photo:hover {
+            transform: scale(1.1);
+        }
+
+        /* Имя и должность */
+        .team-member h3 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .team-member .position {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        /* Контакты всей команды */
+        .team-contacts {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            margin-top: 60px;
+            flex-wrap: wrap;
+        }
+
+        .team-contact {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            text-decoration: none;
+            color: #222;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid #5a0f2e;
+            transition: all 0.2s;
+        }
+
+        .team-contact span {
+            font-size: 28px;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .team-contact:hover {
+            background: #5a0f2e;
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .team-contact span img {
+            width: 28px;
+            height: 28px;
+            display: block;
+            filter: brightness(0);
+            vertical-align: middle;
+        }
+
+        .team-contact:hover span img {
+            filter: brightness(0) invert(1);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1024px) {
+            .team-member {
+                width: 45%;
+            }
+            .menu {
+                top: 80px;
+                left: 20px;
+                right: 20px;
+                flex-direction: column;
+                gap: 20px;
+                border-radius: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu {
+                top: 80px;
+                left: 20px;
+                right: 20px;
+                flex-direction: column;
+                gap: 20px;
+                border-radius: 30px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .team-member {
+                width: 100%;
+            }
+            .team-contacts {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER из главной страницы -->
+<div class="header">
+
+    <div class="left-block">
+        <div class="logo">Q</div>
+
+        <div class="burger" id="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <nav class="menu" id="menu">
+        <a href="mainpage.html" class="menu-item" data-page="mainpage.html">Главная</a>
+        <a href="history.html" class="menu-item" data-page="history.html">История</a>
+        <a href="index.html" class="menu-item" data-page="index.html">Создание</a>
+        <a href="help.html" class="menu-item active" data-page="help.html">Помощь</a>
+    </nav>
+
+    <div class="profile-btn" id="profileBtn">
+        Регистрация/вход
+    </div>
+
+</div>
+
+<div class="container">
+
+    <h1>Часто задаваемые вопросы</h1>
+
+    <div class="card big">
+        <p>
+            Присылайте свои вопросы нам на почту!
+        </p>
+    </div>
+
+    <h2>Наши ценности</h2>
+
+    <div class="card">
+        <p>
+            В «Квизтеррии» мы создаём пространство, где обучение становится увлекательным приключением. Нам важно, чтобы каждый — независимо от возраста — мог погрузиться в атмосферу живого познания, где нет места скуке и однообразию. Мы открыты новым идеям, нестандартным вопросам и смелым форматам, потому что верим: настоящий интерес рождается там, где есть место эксперименту. Наша цель — объединять людей через знания, делая процесс игры не только полезным, но и по-настоящему вдохновляющим.
+        </p>
+    </div>
+
+</div>
+
+<footer class="footer">
+    <h2>Наша команда</h2>
+    <div class="team">
+        <!-- Разработчик 1 -->
+        <div class="team-member">
+            <div class="dev-photo">
+                <img src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/dev1.jpg" alt="Маргарита">
+            </div>
+            <h3>Маргарита Бойко</h3>
+            <p class="position">Frontend-разработчик, UX/UI-дизайнер</p>
+        </div>
+
+        <div class="team-member">
+            <div class="dev-photo">
+                <img src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/dev2.jpg" alt="Вероника">
+            </div>
+            <h3>Новоселова Вероника</h3>
+            <p class="position">Project-менеджер</p>
+        </div>
+
+        <div class="team-member">
+            <div class="dev-photo">
+                <img src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/dev3.jpg" alt="Мария">
+            </div>
+            <h3>Лужецкая Мария</h3>
+            <p class="position">Frontend-разработчик</p>
+        </div>
+
+        <div class="team-member">
+            <div class="dev-photo">
+                <img src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/dev4.jpg" alt="Максим">
+            </div>
+            <h3>Боровский Максим</h3>
+            <p class="position">Backend-разработчик</p>
+        </div>
+
+        <div class="team-member">
+            <div class="dev-photo">
+                <img src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/dev5.jpg" alt="Анастасия">
+            </div>
+            <h3>Елизарова Анастасия</h3>
+            <p class="position">Аналитик данных</p>
+        </div>
+
+        <div class="team-member">
+            <div class="dev-photo">
+                <img src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/dev6.jpg" alt="Диана">
+            </div>
+            <h3>Чуракова Диана</h3>
+            <p class="position">Тестировщик</p>
+        </div>
+    </div>
+
+    <!-- Контакты команды -->
+    <div class="team-contacts">
+        <div id="email">
+            <a href="mailto:quizterraQuiz@mail.ru" class="team-contact">
+                <span><img src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/email.png" alt="Email"></span> quizterraQuiz@mail.ru
+            </a>
+        </div>
+        <div id="vk">
+            <a href="https://vk.com/quizterraQuiz" target="_blank" class="team-contact">
+                <span><img src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/vk.png" alt="VK"></span> vk.com/quizterraQuiz
+            </a>
+        </div>
+        <div id="telegram">
+            <a href="https://t.me/quizterraQuiz" target="_blank" class="team-contact">
+                <span><img src="../../../../../OneDrive/Документы/GitHub/Quereria/frontend/img/telegram.png" alt="Telegram"></span> @QuizterraQuiz
+            </a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // БУРГЕР
+    const burger = document.getElementById('burger');
+    const menu = document.getElementById('menu');
+
+    burger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('active');
+    });
+
+    // Закрытие меню при клике вне
+    document.addEventListener('click', (event) => {
+        if (!menu.contains(event.target) && !burger.contains(event.target)) {
+            menu.classList.remove('active');
+        }
+    });
+
+    // Меню - переход на страницы
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const page = item.getAttribute('data-page');
+            menu.classList.remove('active');
+            window.location.href = page;
+        });
+    });
+
+    // Кнопка профиля
+    document.getElementById('profileBtn').addEventListener('click', () => {
+        window.location.href = 'registration.html';
+    });
+
+    // Подсветка активного пункта меню
+    function setActiveMenuItem() {
+        const currentPage = window.location.pathname.split("/").pop();
+        document.querySelectorAll('.menu-item').forEach(item => {
+            const itemPage = item.getAttribute('data-page');
+            if (itemPage === currentPage) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+    setActiveMenuItem();
+
+    // Автоматическая прокрутка к сохраненному разделу
+    document.addEventListener('DOMContentLoaded', function() {
+        const sectionToScroll = localStorage.getItem('scrollToSection');
+        
+        if (sectionToScroll) {
+            localStorage.removeItem('scrollToSection');
+            
+            const targetElement = document.getElementById(sectionToScroll);
+            
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                
+                targetElement.style.borderRadius = '50px';
+                targetElement.style.transition = 'all 0.5s ease';
+                targetElement.style.backgroundColor = '#F7EB77';
+                
+                setTimeout(() => {
+                    targetElement.style.backgroundColor = '';
+                }, 1000);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

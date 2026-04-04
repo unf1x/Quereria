@@ -1,0 +1,59 @@
+/* Контейнер для кнопок */
+.organizer-controls {
+  display: flex;
+  justify-content: space-between; /* слева и справа */
+  align-items: center;
+  margin: 40px 0;
+  width: 100%;
+}
+
+/* Левый блок (редактировать + мусорка) */
+.left-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Кнопка редактировать / запуск */
+.btn {
+  padding: 15px 30px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.start-btn {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.start-btn:hover {
+  background: var(--primary-dark);
+}
+
+/* Кнопка мусорка */
+.trash-btn {
+  width: 50px;
+  height: 50px;
+  background: #e9dc6a; /* желтый круг */
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.trash-btn:hover {
+  background: #f5e371;
+}
+
+/* Иконка мусорки внутри круга */
+.trash-icon {
+  width: 24px;
+  height: 24px;
+}ы

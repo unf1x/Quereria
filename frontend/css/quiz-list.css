@@ -1,0 +1,26 @@
+/* ===== QUIZ LIST ===== */
+.quiz-list {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.quiz-card {
+  width: 300px;
+  height: 180px;
+  border-radius: 20px;
+  padding: 20px;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.quiz-card button {
+  background: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+}

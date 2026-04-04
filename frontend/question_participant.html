@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Исторический квиз</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600&family=Rufina:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            padding: 30px 60px;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-family: 'Rufina', serif;
+            font-size: 42px;
+        }
+
+        .profile {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #e9dc6a;
+        }
+
+        /* TIMER AREA */
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 120px;
+        }
+
+        .timer {
+            position: relative;
+            width: 420px;
+            height: 420px;
+        }
+
+        .timer svg {
+            transform: rotate(-90deg);
+        }
+
+        .timer circle {
+            fill: none;
+            stroke-width: 18;
+            stroke-linecap: round;
+        }
+
+        .bg {
+            stroke: #e0e0e0;
+        }
+
+        .progress {
+            stroke: url(#grad);
+            stroke-dasharray: 1130;
+            stroke-dashoffset: 0;
+            animation: countdown 3s linear forwards;
+        }
+
+        @keyframes countdown {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: 1130; }
+        }
+
+        .number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 110px;
+            font-weight: 600;
+        }
+
+        /* QUESTION PAGE */
+        .question-container {
+            max-width: 900px;
+            margin: 20px auto 40px;
+            background: white;
+            border-radius: 60px;
+            padding: 50px 60px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            font-size: 42px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #E9DC6A, #A24B58, #700143);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .timer-large {
+            font-size: 36px;
+            font-weight: 700;
+            color: #700143;
+            background: #f8f8f8;
+            padding: 15px 40px;
+            border-radius: 60px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #e9dc6a;
+        }
+
+        .question-title {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 25px 30px;
+            background: #f8f8f8;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .option:hover {
+            background: #f0f0f0;
+            transform: translateX(10px);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #fff2d0 0%, #ffd5c0 100%);
+            border-color: #e9dc6a;
+            box-shadow: 0 10px 20px rgba(233, 220, 106, 0.2);
+        }
+
+        .option.correct {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-color: #dc3545;
+        }
+
+        .option input[type="radio"] {
+            width: 24px;
+            height: 24px;
+            margin-right: 20px;
+            cursor: pointer;
+            accent-color: #A24B58;
+        }
+
+        .option-text {
+            font-size: 24px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .check-mark {
+            position: absolute;
+            right: 30px;
+            font-size: 28px;
+            color: #A24B58;
+            display: none;
+        }
+
+        .option.selected .check-mark {
+            display: block;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #E9DC6A 0%, #A24B58 50%, #700143 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 24px;
+            font-weight: 600;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 30px rgba(162, 75, 88, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* RATING PAGE */
+        .rating-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 60px;
+            padding: 50px 60px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .rating-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #E9DC6A, #A24B58, #700143);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .correct-answer-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 40px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 2px solid #e9dc6a;
+        }
+
+        .correct-answer-label {
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .correct-answer-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: #700143;
+        }
+
+        .leaderboard-title {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 30px;
+            background: #f8f8f8;
+            border-radius: 50px;
+            font-size: 24px;
+            font-weight: 500;
+            transition: transform 0.3s ease;
+        }
+
+        .leaderboard-item:hover {
+            transform: translateX(10px);
+            background: #f0f0f0;
+        }
+
+        .leaderboard-item.first {
+            background: linear-gradient(135deg, #fff2d0 0%, #ffd5c0 100%);
+            border: 2px solid #e9dc6a;
+        }
+
+        .rank {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rank-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #700143;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .rank-name {
+            font-size: 24px;
+        }
+
+        .rank-score {
+            font-size: 28px;
+            font-weight: 700;
+            color: #700143;
+        }
+
+        .play-again-btn {
+            margin-top: 40px;
+            background: linear-gradient(135deg, #E9DC6A 0%, #A24B58 50%, #700143 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 24px;
+            font-weight: 600;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+        }
+
+        .play-again-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 30px rgba(162, 75, 88, 0.3);
+        }
+
+        /* Timer page hide/show */
+        .timer-page {
+            display: block;
+        }
+
+        .question-page {
+            display: none;
+        }
+
+        .rating-page {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .question-container, .rating-container {
+                padding: 30px;
+                border-radius: 40px;
+            }
+            
+            .question-title {
+                font-size: 24px;
+            }
+            
+            .option {
+                padding: 20px;
+            }
+            
+            .option-text {
+                font-size: 18px;
+            }
+            
+            .submit-btn {
+                font-size: 20px;
+                padding: 15px 30px;
+            }
+            
+            .timer-large {
+                font-size: 24px;
+                padding: 10px 20px;
+            }
+            
+            .rating-title {
+                font-size: 36px;
+            }
+            
+            .correct-answer-value {
+                font-size: 32px;
+            }
+            
+            .leaderboard-item {
+                font-size: 18px;
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TIMER PAGE -->
+    <div class="timer-page" id="timerPage">
+        <div class="header">
+            <div class="left">
+                <div class="logo">Q</div>
+            </div>
+            <div class="profile"></div>
+        </div>
+
+        <div class="timer-container">
+            <div class="timer">
+                <svg width="420" height="420">
+                    <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#E9DC6A"/>
+                            <stop offset="50%" stop-color="#A24B58"/>
+                            <stop offset="100%" stop-color="#700143"/>
+                        </linearGradient>
+                    </defs>
+                    <circle class="bg" cx="210" cy="210" r="180"></circle>
+                    <circle class="progress" cx="210" cy="210" r="180"></circle>
+                </svg>
+                <div class="number" id="timerNumber">3</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUESTION PAGE -->
+    <div class="question-page" id="questionPage">
+        <div class="header">
+            <div class="left">
+                <div class="logo">Q</div>
+            </div>
+            <div class="profile"></div>
+        </div>
+
+        <div class="question-container">
+            <div class="question-header">
+                <span class="question-number">Вопрос 1</span>
+                <span class="timer-large" id="questionTimer">15с</span>
+            </div>
+
+            <h2 class="question-title">Кто был первым римским императором?</h2>
+            
+            <div class="options-grid" id="optionsList">
+                <label class="option" data-value="Юлий Цезарь">
+                    <input type="radio" name="answer" value="Юлий Цезарь">
+                    <span class="option-text">Юлий Цезарь</span>
+                    <span class="check-mark">✓</span>
+                </label>
+                <label class="option" data-value="Октавиан Август">
+                    <input type="radio" name="answer" value="Октавиан Август">
+                    <span class="option-text">Октавиан Август</span>
+                    <span class="check-mark">✓</span>
+                </label>
+                <label class="option" data-value="Нерон">
+                    <input type="radio" name="answer" value="Нерон">
+                    <span class="option-text">Нерон</span>
+                    <span class="check-mark">✓</span>
+                </label>
+                <label class="option" data-value="Траян">
+                    <input type="radio" name="answer" value="Траян">
+                    <span class="option-text">Траян</span>
+                    <span class="check-mark">✓</span>
+                </label>
+            </div>
+
+            <button class="submit-btn" id="submitBtn">Проверить ответ</button>
+        </div>
+    </div>
+
+    <!-- RATING PAGE -->
+    <div class="rating-page" id="ratingPage">
+        <div class="header">
+            <div class="left">
+                <div class="logo">Q</div>
+            </div>
+            <div class="profile"></div>
+        </div>
+        <!-- Подтягивается из введенной информации о квизе -->
+        <div class="rating-container">
+            <h1 class="rating-title">Исторический батл</h1>
+            
+            <div class="correct-answer-section">
+                <div class="correct-answer-label">Правильный ответ:</div>
+                <div class="correct-answer-value">Октавиан Август</div>
+            </div>
+
+            <h2 class="leaderboard-title">Таблица лидеров</h2>
+            
+            <div class="leaderboard-list">
+                <div class="leaderboard-item first">
+                    <div class="rank">
+                        <span class="rank-number">1</span>
+                        <span class="rank-name">МурМур (Я)</span>
+                    </div>
+                    <span class="rank-score">30</span>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="rank">
+                        <span class="rank-number">2</span>
+                        <span class="rank-name">Ягуар</span>
+                    </div>
+                    <span class="rank-score">20</span>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="rank">
+                        <span class="rank-number">3</span>
+                        <span class="rank-name">Панда</span>
+                    </div>
+                    <span class="rank-score">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+        // Получаем элементы
+        const timerPage = document.getElementById('timerPage');
+        const questionPage = document.getElementById('questionPage');
+        const ratingPage = document.getElementById('ratingPage');
+        const timerNumber = document.getElementById('timerNumber');
+        const questionTimer = document.getElementById('questionTimer');
+        const submitBtn = document.getElementById('submitBtn');
+        const options = document.querySelectorAll('input[name="answer"]');
+        const optionLabels = document.querySelectorAll('.option');
+        
+        // Таймер обратного отсчета на первой странице (3 секунды)
+        let timeLeft = 3;
+        let questionTimeLeft = 15;
+        let answerSelected = false;
+        let questionTimerInterval;
+        
+        // Обновляем число на таймере
+        timerNumber.textContent = timeLeft;
+        
+        // Запускаем обратный отсчет
+        const countdownInterval = setInterval(() => {
+            timeLeft--;
+            timerNumber.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                
+                // Переключаемся на страницу с вопросом
+                timerPage.style.display = 'none';
+                questionPage.style.display = 'block';
+                
+                // Запускаем таймер на странице вопроса (15 секунд)
+                startQuestionTimer();
+            }
+        }, 1000);
+
+        function startQuestionTimer() {
+            questionTimeLeft = 15;
+            questionTimer.textContent = questionTimeLeft + 'с';
+            
+            questionTimerInterval = setInterval(() => {
+                questionTimeLeft--;
+                questionTimer.textContent = questionTimeLeft + 'с';
+                
+                if (questionTimeLeft <= 0) {
+                    clearInterval(questionTimerInterval);
+                    // Если время вышло, показываем правильный ответ
+                    showCorrectAnswer();
+                    
+                    // Переходим на страницу рейтинга через 2 секунды
+                    setTimeout(() => {
+                        questionPage.style.display = 'none';
+                        ratingPage.style.display = 'block';
+                    }, 2000);
+                }
+            }, 1000);
+        }
+
+        // Обработка выбора варианта ответа
+        options.forEach(option => {
+            option.addEventListener('change', function() {
+                // Убираем класс selected у всех опций
+                optionLabels.forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Добавляем класс selected к родителю выбранной радио-кнопки
+                if (this.checked) {
+                    this.closest('.option').classList.add('selected');
+                    answerSelected = true;
+                }
+            });
+        });
+
+        // Обработка клика по всей области опции
+        optionLabels.forEach(optionDiv => {
+            optionDiv.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                
+                // Запускаем событие change
+                const event = new Event('change', { bubbles: true });
+                radio.dispatchEvent(event);
+            });
+        });
+
+        // Функция показа правильного ответа
+        function showCorrectAnswer() {
+            const correctAnswer = "Октавиан Август";
+            
+            optionLabels.forEach(option => {
+                const optionValue = option.querySelector('.option-text').textContent;
+                
+                if (optionValue === correctAnswer) {
+                    option.classList.add('correct');
+                }
+                
+                // Если был выбран неправильный ответ, подсвечиваем его красным
+                if (option.querySelector('input[type="radio"]').checked && optionValue !== correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+            });
+        }
+
+        // Обработка нажатия на кнопку проверки
+        submitBtn.addEventListener('click', function() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            
+            if (!selectedOption) return;
+
+            const answer = selectedOption.value;
+            const correctAnswer = "Октавиан Август";
+            
+            // Останавливаем таймер вопроса
+            clearInterval(questionTimerInterval);
+            
+            // Подсвечиваем правильный и неправильный ответы
+            optionLabels.forEach(option => {
+                const optionValue = option.querySelector('.option-text').textContent;
+                
+                if (optionValue === correctAnswer) {
+                    option.classList.add('correct');
+                }
+                
+                if (option.querySelector('input[type="radio"]').checked && optionValue !== correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            // Блокируем все опции после ответа
+            options.forEach(option => {
+                option.disabled = true;
+            });
+            
+            submitBtn.disabled = true;
+            
+            // Переходим на страницу рейтинга через 2 секунды
+            setTimeout(() => {
+                questionPage.style.display = 'none';
+                ratingPage.style.display = 'block';
+            }, 2000);
+        });
+
+        // Обработка окончания анимации прогресс-бара
+        const progressCircle = document.querySelector('.progress');
+        progressCircle.addEventListener('animationend', function() {
+            if (timeLeft <= 0) {
+                timerPage.style.display = 'none';
+                questionPage.style.display = 'block';
+                startQuestionTimer();
+            }
+        });
+        // Кликабельность желтого кружочка (профиля) - переход в личный кабинет (только на этапе ожидания перед началом)
+        const profileCircle = document.querySelector('.profile');
+        profileCircle.style.cursor = 'pointer';
+        profileCircle.addEventListener('click', function() {
+     window.location.href = 'profile.html';
+});
+    </script>
+</body>
+</html>
