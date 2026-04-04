@@ -648,9 +648,10 @@
     const startQuizBtn = document.getElementById('startQuizBtn');
     if (startQuizBtn) {
         startQuizBtn.addEventListener('click', () => {
-    localStorage.setItem(`quiz_started_${quizId}`, 'true');
-    window.location.href = `question.html?quizId=${quizId}`;
-});
+            localStorage.setItem(`quiz_started_${quizId}`, 'true');
+            window.location.href = `question.html?quizId=${quizId}`;
+        });
+    }
 
     // === КНОПКА "ВЫЙТИ" ===
     const exitQuizBtn = document.getElementById('exitQuizBtn');
