@@ -1131,6 +1131,31 @@
         }
     }
 </script>
+<script>
+    async function requireAuth() {
+        try {
+            const response = await fetch('/api/auth/me', {
+                method: 'GET',
+                credentials: 'include'
+            });
 
+            if (!response.ok) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const user = await response.json();
+
+            const nameEl = document.querySelector('.user-name, #userName, h1');
+            if (nameEl && user.name) {
+                nameEl.textContent = user.name;
+            }
+        } catch (e) {
+            window.location.href = 'login.html';
+        }
+    }
+
+    requireAuth();
+</script>
 </body>
 </html>

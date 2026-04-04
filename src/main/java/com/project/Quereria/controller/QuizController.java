@@ -50,4 +50,8 @@ public class QuizController {
     public ResponseEntity<List<ResultResponse>> getQuizResults(@PathVariable Long id) {
         return ResponseEntity.ok(quizService.getQuizResults(id));
     }
+    @GetMapping("/history")
+    public ResponseEntity<List<HistoryItemResponse>> getHistory() {
+        return ResponseEntity.ok(quizService.getHistory());
+    }
 }

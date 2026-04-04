@@ -262,12 +262,12 @@
             const nickname = nicknameInput.value.trim() || 'Вася Пупкин';
             const selectedGroup = '';
 
-            let players = JSON.parse(localStorage.getItem('quizPlayers')) || [];
+            let players = JSON.parse(localStorage.getItem(`quizPlayers_${quizId}`)) || [];
 
             const exists = players.some(p => p.name === nickname && p.group === selectedGroup);
             if (!exists) {
                 players.push({ name: nickname, group: selectedGroup });
-                localStorage.setItem('quizPlayers', JSON.stringify(players));
+                localStorage.setItem(`quizPlayers_${quizId}`, JSON.stringify(players));
             }
 
             const params = new URLSearchParams(window.location.search);

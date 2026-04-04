@@ -434,7 +434,7 @@
         const playersContainer = document.getElementById('playersList');
         const countSpan = document.getElementById('playersCount');
         
-        let players = JSON.parse(localStorage.getItem('quizPlayers')) || [];
+        let players = JSON.parse(localStorage.getItem(`quizPlayers_${quizId}`)) || [];
         
         playersContainer.innerHTML = '';
         
@@ -546,7 +546,7 @@ function watchQuizStart() {
 
     // === СЛУШАЕМ ИЗМЕНЕНИЯ В localStorage ===
     window.addEventListener('storage', function(e) {
-        if (e.key === 'quizPlayers') {
+        if (e.key === `quizPlayers_${quizId}`) {
             loadPlayers();
         }
     });

@@ -310,6 +310,17 @@ public class QuizService {
                 ))
                 .toList();
     }
+    public List<HistoryItemResponse> getHistory() {
+        return resultRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(result -> new HistoryItemResponse(
+                        result.getId(),
+                        result.getQuiz().getId(),
+                        result.getQuiz().getName(),
+                        result.getScore(),
+                        result.getCreatedAt()
+                ))
+                .toList();
+    }
 
     public QuizSubmitResponse submitQuiz(Long quizId, QuizSubmitRequest request) {
         Quiz quiz = quizRepository.findById(quizId)
@@ -425,10 +436,10 @@ public class QuizService {
         int wrongAnswers = totalQuestions - correctAnswers;
         int scorePercent = totalQuestions == 0 ? 0 : (correctAnswers * 100) / totalQuestions;
 
-        Result savedResult = resultRepository.save(
+        resultRepository.save(
                 Result.builder()
                         .score(scorePercent)
-                        .userId(null)
+                        .userId(request != null ? request.getUserId() : null)
                         .quiz(quiz)
                         .createdAt(LocalDateTime.now())
                         .build()

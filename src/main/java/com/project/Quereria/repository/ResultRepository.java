@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ResultRepository extends JpaRepository<Result, Long> {
     List<Result> findByQuizIdOrderByCreatedAtDesc(Long quizId);
+    List<Result> findAllByOrderByCreatedAtDesc();
 }

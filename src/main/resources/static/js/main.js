@@ -41,8 +41,14 @@ async function loadQuizzes() {
   }
 }
 
-document.getElementById("create-btn").addEventListener("click", () => {
-  window.location.href = "create.html";
-});
+const createBtn = document.getElementById("create-btn");
+if (createBtn) {
+  createBtn.addEventListener("click", () => {
+    window.location.href = "create.html";
+  });
+}
 
-loadQuizzes();
+const quizContainer = document.getElementById("quiz-container");
+if (quizContainer) {
+  loadQuizzes();
+}
