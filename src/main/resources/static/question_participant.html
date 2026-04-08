@@ -14,7 +14,7 @@
         }
 
         body {
-            background: #eeeeee;
+            background: #f5f5f5;
             padding: 30px 60px;
             min-height: 100vh;
         }
@@ -456,8 +456,29 @@
             </div>
 
             <h2 class="question-title">Кто был первым римским императором?</h2>
-
-            <div class="options-grid" id="optionsList"></div>
+            
+            <div class="options-grid" id="optionsList">
+                <label class="option" data-value="Юлий Цезарь">
+                    <input type="radio" name="answer" value="Юлий Цезарь">
+                    <span class="option-text">Юлий Цезарь</span>
+                    <span class="check-mark">✓</span>
+                </label>
+                <label class="option" data-value="Октавиан Август">
+                    <input type="radio" name="answer" value="Октавиан Август">
+                    <span class="option-text">Октавиан Август</span>
+                    <span class="check-mark">✓</span>
+                </label>
+                <label class="option" data-value="Нерон">
+                    <input type="radio" name="answer" value="Нерон">
+                    <span class="option-text">Нерон</span>
+                    <span class="check-mark">✓</span>
+                </label>
+                <label class="option" data-value="Траян">
+                    <input type="radio" name="answer" value="Траян">
+                    <span class="option-text">Траян</span>
+                    <span class="check-mark">✓</span>
+                </label>
+            </div>
 
             <button class="submit-btn" id="submitBtn">Проверить ответ</button>
         </div>
@@ -507,252 +528,166 @@
             </div>
         </div>
     </div>
-    <script>
+<script>
+        // Получаем элементы
         const timerPage = document.getElementById('timerPage');
         const questionPage = document.getElementById('questionPage');
         const ratingPage = document.getElementById('ratingPage');
-
         const timerNumber = document.getElementById('timerNumber');
         const questionTimer = document.getElementById('questionTimer');
         const submitBtn = document.getElementById('submitBtn');
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const quizId = urlParams.get("quizId");
-
-        let quizData = null;
-        let currentQuestionIndex = 0;
-        let currentQuestion = null;
-        let questionTimerInterval = null;
-        let collectedAnswers = [];
-
-        if (!quizId) {
-            alert("quizId не найден в URL");
-            window.location.href = "index.html";
-        }
-
-        async function loadQuiz() {
-            try {
-                const response = await fetch(`http://localhost:8080/api/quizzes/${quizId}/play`);
-
-                if (!response.ok) {
-                    throw new Error("Не удалось загрузить квиз");
-                }
-
-                quizData = await response.json();
-
-                if (!quizData.questions || !quizData.questions.length) {
-                    throw new Error("В квизе нет вопросов");
-                }
-
-                currentQuestionIndex = 0;
-            currentQuestion = quizData.questions[currentQuestionIndex];
-            renderQuestion(currentQuestion);
-            startIntroTimer();
-            } catch (error) {
-                console.error(error);
-                alert("Ошибка загрузки квиза");
-            }
-        }
-
-        function startIntroTimer() {
-            let timeLeft = 3;
+        const options = document.querySelectorAll('input[name="answer"]');
+        const optionLabels = document.querySelectorAll('.option');
+        
+        // Таймер обратного отсчета на первой странице (3 секунды)
+        let timeLeft = 3;
+        let questionTimeLeft = 15;
+        let answerSelected = false;
+        let questionTimerInterval;
+        
+        // Обновляем число на таймере
+        timerNumber.textContent = timeLeft;
+        
+        // Запускаем обратный отсчет
+        const countdownInterval = setInterval(() => {
+            timeLeft--;
             timerNumber.textContent = timeLeft;
-
-            const countdownInterval = setInterval(() => {
-                timeLeft--;
-                timerNumber.textContent = timeLeft;
-
-                if (timeLeft <= 0) {
-                    clearInterval(countdownInterval);
-                    timerPage.style.display = 'none';
-                    questionPage.style.display = 'block';
-                    startQuestionTimer();
-                }
-            }, 1000);
-        }
+            
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                
+                // Переключаемся на страницу с вопросом
+                timerPage.style.display = 'none';
+                questionPage.style.display = 'block';
+                
+                // Запускаем таймер на странице вопроса (15 секунд)
+                startQuestionTimer();
+            }
+        }, 1000);
 
         function startQuestionTimer() {
-            const seconds = currentQuestion.timerSeconds ?? 0;
-
-            if (!seconds || seconds <= 0) {
-                questionTimer.textContent = "Без лимита";
-                return;
-            }
-
-            let timeLeft = seconds;
-            questionTimer.textContent = `${timeLeft}с`;
-
+            questionTimeLeft = 15;
+            questionTimer.textContent = questionTimeLeft + 'с';
+            
             questionTimerInterval = setInterval(() => {
-                timeLeft--;
-                questionTimer.textContent = `${timeLeft}с`;
-
-                if (timeLeft <= 0) {
+                questionTimeLeft--;
+                questionTimer.textContent = questionTimeLeft + 'с';
+                
+                if (questionTimeLeft <= 0) {
                     clearInterval(questionTimerInterval);
-                    submitCurrentAnswer();
+                    // Если время вышло, показываем правильный ответ
+                    showCorrectAnswer();
+                    
+                    // Переходим на страницу рейтинга через 2 секунды
+                    setTimeout(() => {
+                        questionPage.style.display = 'none';
+                        ratingPage.style.display = 'block';
+                    }, 2000);
                 }
             }, 1000);
         }
 
-        function renderQuestion(question) {
-            const questionNumberEl = document.querySelector('.question-number');
-            const questionTitleEl = document.querySelector('.question-title');
-            const optionsListEl = document.getElementById('optionsList');
-
-            questionNumberEl.textContent = `Вопрос ${question.number}`;
-            questionTitleEl.textContent = question.text;
-            optionsListEl.innerHTML = "";
-            submitBtn.disabled = false;
-
-            if (question.type === "CHOICE") {
-                question.answers.forEach(answer => {
-                    const label = document.createElement("label");
-                    label.className = "option";
-                    label.innerHTML = `
-                        <input type="radio" name="answer" value="${answer.id}">
-                        <span class="option-text">${answer.text}</span>
-                        <span class="check-mark">✓</span>
-                    `;
-
-                    label.addEventListener("click", () => {
-                        const radio = label.querySelector('input[type="radio"]');
-                        radio.checked = true;
-
-                        document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-                        label.classList.add('selected');
-                    });
-
-                    optionsListEl.appendChild(label);
+        // Обработка выбора варианта ответа
+        options.forEach(option => {
+            option.addEventListener('change', function() {
+                // Убираем класс selected у всех опций
+                optionLabels.forEach(opt => {
+                    opt.classList.remove('selected');
                 });
-            } else if (question.type === "OPEN") {
-                optionsListEl.innerHTML = `
-                    <input
-                        type="text"
-                        id="openAnswerInput"
-                        placeholder="Введите ответ"
-                        style="width:100%; padding:20px; border-radius:30px; border:2px solid #ddd; font-size:20px;"
-                    >
-                `;
-            }
+                
+                // Добавляем класс selected к родителю выбранной радио-кнопки
+                if (this.checked) {
+                    this.closest('.option').classList.add('selected');
+                    answerSelected = true;
+                }
+            });
+        });
+
+        // Обработка клика по всей области опции
+        optionLabels.forEach(optionDiv => {
+            optionDiv.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                
+                // Запускаем событие change
+                const event = new Event('change', { bubbles: true });
+                radio.dispatchEvent(event);
+            });
+        });
+
+        // Функция показа правильного ответа
+        function showCorrectAnswer() {
+            const correctAnswer = "Октавиан Август";
+            
+            optionLabels.forEach(option => {
+                const optionValue = option.querySelector('.option-text').textContent;
+                
+                if (optionValue === correctAnswer) {
+                    option.classList.add('correct');
+                }
+                
+                // Если был выбран неправильный ответ, подсвечиваем его красным
+                if (option.querySelector('input[type="radio"]').checked && optionValue !== correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+            });
         }
 
-            async function submitCurrentAnswer() {
-        submitBtn.disabled = true;
+        // Обработка нажатия на кнопку проверки
+        submitBtn.addEventListener('click', function() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            
+            if (!selectedOption) return;
 
-        if (questionTimerInterval) {
+            const answer = selectedOption.value;
+            const correctAnswer = "Октавиан Август";
+            
+            // Останавливаем таймер вопроса
             clearInterval(questionTimerInterval);
-        }
-
-        const answerPayload = {
-            questionId: currentQuestion.id
-        };
-
-        if (currentQuestion.type === "CHOICE") {
-            const selected = document.querySelector('input[name="answer"]:checked');
-            answerPayload.selectedAnswerId = selected ? Number(selected.value) : null;
-        }
-
-        if (currentQuestion.type === "OPEN") {
-            const input = document.getElementById("openAnswerInput");
-            answerPayload.textAnswer = input ? input.value.trim() : "";
-        }
-
-        const existingIndex = collectedAnswers.findIndex(a => a.questionId === currentQuestion.id);
-        if (existingIndex >= 0) {
-            collectedAnswers[existingIndex] = answerPayload;
-        } else {
-            collectedAnswers.push(answerPayload);
-        }
-
-        const nextIndex = currentQuestionIndex + 1;
-
-        if (nextIndex < quizData.questions.length) {
-            currentQuestionIndex = nextIndex;
-            currentQuestion = quizData.questions[currentQuestionIndex];
-            renderQuestion(currentQuestion);
-            submitBtn.disabled = false;
-            startQuestionTimer();
-            return;
-        }
-
-        try {
-            const response = await fetch(`http://localhost:8080/api/quizzes/${quizId}/submit`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    answers: collectedAnswers
-                })
+            
+            // Подсвечиваем правильный и неправильный ответы
+            optionLabels.forEach(option => {
+                const optionValue = option.querySelector('.option-text').textContent;
+                
+                if (optionValue === correctAnswer) {
+                    option.classList.add('correct');
+                }
+                
+                if (option.querySelector('input[type="radio"]').checked && optionValue !== correctAnswer) {
+                    option.classList.add('incorrect');
+                }
             });
+            
+            // Блокируем все опции после ответа
+            options.forEach(option => {
+                option.disabled = true;
+            });
+            
+            submitBtn.disabled = true;
+            
+            // Переходим на страницу рейтинга через 2 секунды
+            setTimeout(() => {
+                questionPage.style.display = 'none';
+                ratingPage.style.display = 'block';
+            }, 2000);
+        });
 
-            if (!response.ok) {
-                throw new Error("Не удалось отправить ответы");
+        // Обработка окончания анимации прогресс-бара
+        const progressCircle = document.querySelector('.progress');
+        progressCircle.addEventListener('animationend', function() {
+            if (timeLeft <= 0) {
+                timerPage.style.display = 'none';
+                questionPage.style.display = 'block';
+                startQuestionTimer();
             }
-
-            const result = await response.json();
-            showResult(result);
-        } catch (error) {
-            console.error(error);
-            alert("Ошибка при отправке ответов");
-            submitBtn.disabled = false;
-        }
-    }
-
-        function showResult(result) {
-            questionPage.style.display = 'none';
-            ratingPage.style.display = 'block';
-
-            const ratingTitle = document.querySelector('.rating-title');
-            const correctAnswerLabel = document.querySelector('.correct-answer-label');
-            const correctAnswerValue = document.querySelector('.correct-answer-value');
-            const leaderboardTitle = document.querySelector('.leaderboard-title');
-            const leaderboardList = document.querySelector('.leaderboard-list');
-
-            if (ratingTitle) {
-                ratingTitle.textContent = quizData.title || "Результат";
-            }
-
-            if (correctAnswerLabel) {
-                correctAnswerLabel.textContent = "Ваш результат:";
-            }
-
-            if (correctAnswerValue) {
-                correctAnswerValue.textContent = `${result.scorePercent}%`;
-            }
-
-            if (leaderboardTitle) {
-                leaderboardTitle.textContent = "Детали";
-            }
-
-            if (leaderboardList) {
-                leaderboardList.innerHTML = "";
-
-                result.results.forEach(item => {
-                    const row = document.createElement("div");
-                    row.className = "leaderboard-item";
-                    row.innerHTML = `
-                        <div class="rank">
-                            <span class="rank-number">${item.questionNumber}</span>
-                            <span class="rank-name">${item.questionText}</span>
-                        </div>
-                        <span class="rank-score">${item.correct ? "✔" : "✖"}</span>
-                    `;
-                    leaderboardList.appendChild(row);
-                });
-            }
-        }
-
-        submitBtn.addEventListener("click", submitCurrentAnswer);
-
+        });
+        // Кликабельность желтого кружочка (профиля) - переход в личный кабинет (только на этапе ожидания перед началом)
         const profileCircle = document.querySelector('.profile');
-        if (profileCircle) {
-            profileCircle.style.cursor = 'pointer';
-            profileCircle.addEventListener('click', function() {
-                window.location.href = 'profile.html';
-            });
-        }
-
-        loadQuiz();
+        profileCircle.style.cursor = 'pointer';
+        profileCircle.addEventListener('click', function() {
+     window.location.href = 'profile.html';
+});
     </script>
+    <script type="module" src="js/header.js"></script>
 </body>
 </html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр квиза</title>
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/waitingroom.css">
+    <link rel="stylesheet" href="css/viewquiz.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rufina:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="header">
+    <div class="left-block">
+        <div class="logo">Q</div>
+        <div class="burger" id="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <nav class="menu" id="menu">
+        <a href="index.html" class="menu-item" data-page="index.html">Главная</a>
+        <a href="history.html" class="menu-item" data-page="history.html">История</a>
+        <a href="create.html" class="menu-item" data-page="create.html">Создание</a>
+        <a href="help.html" class="menu-item" data-page="help.html">Помощь</a>
+    </nav>
+
+    <div class="profile" id="profileBtn"></div>
+</header>
+
+<div class="main">
+    <div class="quiz-info">
+        <h2 id="quizTitle">Загрузка...</h2>
+
+        <p class="label">Описание:</p>
+        <p id="quizDescription">—</p>
+
+        <p class="label">Количество вопросов:</p>
+        <p id="quizQuestions">—</p>
+
+        <p class="label">Время прохождения:</p>
+        <p id="quizTime">—</p>
+
+        <p class="label">Вид квиза:</p>
+        <p id="quizType">—</p>
+    </div>
+
+    <div class="right">
+        <img class="quiz-image" src="img/history_quiz.png" alt="quiz image">
+
+        <div class="author" id="quizAuthor">
+            Автор: локально не задан
+        </div>
+
+        <div class="link-block">
+            <input type="text" id="quizLink" readonly>
+            <div class="copy-icon" id="copyLinkBtn" title="Копировать ссылку">⧉</div>
+        </div>
+
+        <div class="code-block">
+            <span>Код квиза:</span>
+            <div class="code" id="quizCode">—</div>
+            <div class="code-copy-icon" id="copyCodeBtn" title="Копировать код">⧉</div>
+        </div>
+    </div>
+</div>
+
+<div class="organizer-controls">
+    <div class="left-controls">
+        <button class="btn start-btn" id="editQuizBtn">Назад к созданию</button>
+    </div>
+
+    <button class="btn start-btn" id="launchQuizBtn">
+        Запустить квиз
+    </button>
+</div>
+
+<div class="toast" id="toast">Скопировано!</div>
+
+<script type="module" src="js/header.js"></script>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const quizId = params.get("id");
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.style.display = "block";
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 2000);
+    }
+
+    function formatTime(totalSeconds) {
+      if (!totalSeconds) return "Без лимита";
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      if (minutes === 0) return `${seconds} сек`;
+      return `${minutes} мин ${seconds} сек`;
+    }
+
+    function detectQuizType(questions) {
+      if (!questions || !questions.length) return "Не указан";
+
+      const hasOpen = questions.some(q => q.type === "OPEN");
+      const hasChoice = questions.some(q => q.type === "CHOICE");
+
+      if (hasOpen && hasChoice) return "Смешанный";
+      if (hasChoice) return "Тест";
+      if (hasOpen) return "Открытый";
+      return "Не указан";
+    }
+
+    async function loadQuiz() {
+      if (!quizId) {
+        alert("Не передан id квиза");
+        window.location.href = "index.html";
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/quizzes/${quizId}/full`);
+
+        if (!response.ok) {
+          throw new Error("Не удалось загрузить квиз");
+        }
+
+        const quiz = await response.json();
+
+        document.getElementById("quizTitle").textContent = quiz.title || "Без названия";
+        document.getElementById("quizDescription").textContent = quiz.description || "Без описания";
+        document.getElementById("quizQuestions").textContent = quiz.questions?.length || 0;
+
+        const totalTime = (quiz.questions || []).reduce((sum, q) => {
+          return sum + (q.timerSeconds || 0);
+        }, 0);
+
+        document.getElementById("quizTime").textContent = formatTime(totalTime);
+        document.getElementById("quizType").textContent = detectQuizType(quiz.questions);
+
+        const link = `${window.location.origin}/nickname.html?quizId=${quiz.id}`;
+        document.getElementById("quizLink").value = link;
+        document.getElementById("quizCode").textContent = String(quiz.id);
+      } catch (error) {
+        console.error(error);
+        alert("Ошибка загрузки квиза");
+        window.location.href = "index.html";
+      }
+    }
+
+    document.getElementById("copyLinkBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText(document.getElementById("quizLink").value);
+      showToast("Ссылка скопирована");
+    });
+
+    document.getElementById("copyCodeBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText(document.getElementById("quizCode").textContent);
+      showToast("ID скопирован");
+    });
+
+    document.getElementById("editQuizBtn").addEventListener("click", () => {
+      window.location.href = "create.html";
+    });
+
+    document.getElementById("launchQuizBtn").addEventListener("click", () => {
+      window.location.href = `waitingroom_user.html?quizId=${quizId}`;
+    });
+
+    loadQuiz();
+</script>
+<script type="module" src="js/header.js"></script>
+</body>
+</html>

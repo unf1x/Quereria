@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Квизтерра</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rufina:wght@700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat Alternates', sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #f5f5f5;
+}
+
+/* КОНТЕЙНЕР */
+.container {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+/* ===== HEADER & BURGER MENU ===== */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px 100px;
+    margin-bottom: 40px;
+    position: relative;
+}
+    
+
+.logo {
+    font-family: 'Rufina', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+}
+
+.left-block {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.burger {
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: 0.3s;
+}
+
+.burger span {
+    position: absolute;
+    width: 30px;
+    height: 3px;
+    background: black;
+    border-radius: 2px;
+}
+
+.burger span:nth-child(1) { transform: translateY(-8px); }
+.burger span:nth-child(2) { transform: translateY(0); }
+.burger span:nth-child(3) { transform: translateY(8px); }
+
+.burger:hover {
+    background: #700143;
+}
+
+.burger:hover span {
+    background: white;
+}
+
+/* ВЫПАДАЮЩЕЕ МЕНЮ */
+.menu {
+    position: absolute;
+    left: 20%;
+    transform: translate(20px, -50%);
+    background: white;
+    padding: 20px 40px;
+    border-radius: 50px;
+    display: flex;
+    gap: 60px;
+
+    opacity: 0;
+    transform: translateX(-50px);
+    pointer-events: none;
+
+    transition: 0.4s ease;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.66);
+    z-index: 999;
+}
+
+.menu.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.menu-item {
+    text-decoration: none;
+    color: black;
+    font-size: 22px;
+    font-weight: 500;
+    position: relative;
+}
+
+.menu-item::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0%;
+    height: 4px;
+    background: #f2e46c;
+    transition: 0.4s;
+}
+
+.menu-item:hover::after,
+.menu-item.active::after {
+    width: 100%;
+}
+
+.profile {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e9dc6a;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.profile:hover {
+    transform: scale(1.05);
+}
+
+/* PROFILE */
+.profile-btn {
+    background: #e0e0e0;
+    padding: 12px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: 500;
+}
+
+.profile-btn:hover {
+    background: #700143;
+    color: white;
+}
+
+/* TITLE */
+.title {
+    text-align: center;
+    font-size: 48px;
+    font-weight: 600;
+    margin-top: 40px;
+}
+
+/* ACTIONS */
+.actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.start-btn {
+    background: #700143;
+    color: white;
+    padding: 18px 40px;
+    border-radius: 40px;
+    font-size: 20px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.start-btn:hover {
+    transform: scale(1.05);
+}
+
+.code-input {
+    border: none;
+    border-bottom: 2px solid black;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: 500;
+    outline: none;
+    background: transparent;
+}
+
+/* SEARCH */
+.search-container {
+    margin: 40px auto;
+    width: 60%;
+    position: relative;
+}
+
+.search-wrapper {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.search-input {
+    width: 100%;
+    background: #F7EB77;
+    padding: 15px 25px;
+    border-radius: 40px;
+    font-size: 18px;
+    font-weight: 500;
+    border: none;
+    outline: none;
+    cursor: text;
+    transition: 0.3s;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 3px #700143;
+    background: #fff3c4;
+}
+
+.search-input::placeholder {
+    color: #646464;
+    font-weight: 400;
+}
+
+.search-message {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px;
+    margin-top: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    display: none;
+    font-weight: 500;
+    color: #646464;
+}
+
+.search-message.active {
+    display: block;
+}
+
+.search-button {
+    background: #ccc;
+    padding: 15px 30px;
+    border-radius: 40px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.search-button:hover {
+    background: #700143;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.search-button:active {
+    transform: translateY(0);
+}
+
+/* CAROUSEL */
+.section-title {
+    margin: 40px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 20px 20px;
+}
+
+.card {
+    min-width: 400px;
+    height: 200px;
+    border-radius: 30px;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+    
+.card::after {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background: rgba(247, 235, 119, 0.8);
+    border-radius: 20px;
+    top: 40px;
+    left: 40px;
+}
+
+/* FOOTER */
+.footer {
+    bottom: 2px;
+    left: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.icon {
+    width: 50px;
+    height: 50px;
+    background-color: #700143;
+    border-radius: 50%;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.icon:hover {
+    transform: scale(1.1);
+}
+
+.icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    display: block;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+    <div class="left-block">
+        <div class="logo">Q</div>
+
+        <div class="burger" id="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <nav class="menu" id="menu">
+        <a href="mainpage.html" class="menu-item" data-page="mainpage.html">Главная</a>
+        <a href="history.html" class="menu-item" data-page="history.html">История</a>
+        <a href="index.html" class="menu-item" data-page="index.html">Создание</a>
+        <a href="help.html" class="menu-item" data-page="help.html">Помощь</a>
+    </nav>
+
+    <div class="profile-btn" id="profileBtn">
+        Регистрация/вход
+    </div>
+
+</div>
+<div class="container">
+<h1 class="title">Приветствуем в Квизтерре!</h1>
+
+<div class="actions">
+    <button class="start-btn" id="joinQuizBtn">Начать игру</button>
+    <input class="code-input" id="quizCodeInput" placeholder="Введите код 123456">
+</div>
+
+<div class="search-container">
+    <div class="search-wrapper">
+        <input type="text" class="search-input" placeholder="Поиск квизов...">
+        <button class="search-button">Найти</button>
+    </div>
+    <div class="search-message" id="searchMessage"></div>
+</div>
+
+<div class="section-title">Популярные квизы</div>
+
+<div class="carousel" id="carousel">
+    <div class="card" data-quiz-title="Кинематография" style="background-image:url('img/cinematography.png')"></div>
+    <div class="card" data-quiz-title="Музыка" style="background-image:url('img/music.png')"></div>
+    <div class="card" data-quiz-title="География мира" style="background-image:url('img/geography.png')"></div>
+    <div class="card" data-quiz-title="Искусство" style="background-image:url('img/art.png')"></div>
+    <div class="card" data-quiz-title="Наука" style="background-image:url('img/science.png')"></div>
+</div>
+<div class="footer">
+    <div class="icon" data-section="us"><img src="img/user.png" alt="User"></div>
+    <div class="icon" data-section="email"><img src="img/email.png" alt="Email"></div>
+    <div class="icon" data-section="vk"><img src="img/vk.png" alt="VK"></div>
+    <div class="icon" data-section="telegram"><img src="img/telegram.png" alt="Telegram"></div>
+</div>
+
+</div>
+
+<script>
+    function goToHelpSection(sectionId) {
+        localStorage.setItem('scrollToSection', sectionId);
+        window.location.href = 'help.html';
+    }
+
+    function showSearchMessage(message) {
+        const messageContainer = document.getElementById('searchMessage');
+        if (messageContainer) {
+            messageContainer.textContent = message;
+            messageContainer.classList.add('active');
+
+            setTimeout(() => {
+                messageContainer.classList.remove('active');
+            }, 2000);
+        }
+    }
+
+    async function fetchAllQuizzes() {
+        const response = await fetch('/api/quizzes', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error('Не удалось получить список квизов');
+        }
+
+        return await response.json();
+    }
+
+    async function openQuizByCode(rawCode) {
+        const quizCode = String(rawCode || '').trim();
+
+        if (!quizCode) {
+            showSearchMessage('Введите код квиза');
+            return;
+        }
+
+        if (!/^\d+$/.test(quizCode)) {
+            showSearchMessage('Код квиза должен состоять из цифр');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/quizzes/${quizCode}/full`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                showSearchMessage('Квиз с таким кодом не найден');
+                return;
+            }
+
+            window.location.href = `nickname.html?quizId=${quizCode}`;
+        } catch (error) {
+            console.error(error);
+            showSearchMessage('Не удалось начать игру');
+        }
+    }
+
+    async function openPopularQuizByTitle(title) {
+        try {
+            const quizzes = await fetchAllQuizzes();
+            const quiz = quizzes.find(item => item.title === title);
+
+            if (!quiz) {
+                showSearchMessage(`Квиз "${title}" не найден`);
+                return;
+            }
+
+            window.location.href = `viewquiz.html?id=${quiz.id}`;
+        } catch (error) {
+            console.error(error);
+            showSearchMessage('Не удалось открыть квиз');
+        }
+    }
+
+    async function searchQuizzes(query) {
+        const normalizedQuery = query.trim().toLowerCase();
+
+        if (!normalizedQuery) {
+            return [];
+        }
+
+        const quizzes = await fetchAllQuizzes();
+        return quizzes.filter(quiz =>
+            (quiz.title || '').toLowerCase().includes(normalizedQuery)
+        );
+    }
+
+    const searchInput = document.querySelector('.search-input');
+    const searchButton = document.querySelector('.search-button');
+    const joinQuizBtn = document.getElementById('joinQuizBtn');
+    const quizCodeInput = document.getElementById('quizCodeInput');
+
+    if (quizCodeInput) {
+        quizCodeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                openQuizByCode(quizCodeInput.value);
+            }
+        });
+    }
+
+    if (joinQuizBtn) {
+        joinQuizBtn.addEventListener('click', () => {
+            openQuizByCode(quizCodeInput ? quizCodeInput.value : '');
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+
+                if (!query) {
+                    showSearchMessage('Введите запрос для поиска');
+                    return;
+                }
+
+                try {
+                    const results = await searchQuizzes(query);
+
+                    if (results.length === 1) {
+                        window.location.href = `viewquiz.html?id=${results[0].id}`;
+                        return;
+                    }
+
+                    if (results.length > 1) {
+                        window.location.href = `viewquiz.html?id=${results[0].id}`;
+                        return;
+                    }
+
+                    showSearchMessage('Ничего не найдено');
+                } catch (error) {
+                    console.error(error);
+                    showSearchMessage('Ошибка поиска квизов');
+                }
+            }
+        });
+    }
+
+    if (searchButton) {
+        searchButton.addEventListener('click', async () => {
+            const query = searchInput ? searchInput.value.trim() : '';
+
+            if (!query) {
+                showSearchMessage('Введите запрос для поиска');
+                return;
+            }
+
+            try {
+                const results = await searchQuizzes(query);
+
+                if (results.length === 1) {
+                    window.location.href = `viewquiz.html?id=${results[0].id}`;
+                    return;
+                }
+
+                if (results.length > 1) {
+                    window.location.href = `viewquiz.html?id=${results[0].id}`;
+                    return;
+                }
+
+                showSearchMessage('Ничего не найдено');
+            } catch (error) {
+                console.error(error);
+                showSearchMessage('Ошибка поиска квизов');
+            }
+        });
+    }
+
+    document.querySelectorAll('#carousel .card').forEach(card => {
+        card.addEventListener('click', () => {
+            const title = card.dataset.quizTitle;
+            openPopularQuizByTitle(title);
+        });
+    });
+</script>
+<script type="module" src="js/header.js"></script>
+</body>
+</html>

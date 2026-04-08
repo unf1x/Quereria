@@ -1,0 +1,240 @@
+/* ===== WAITING ROOM PAGE ===== */
+body {
+  padding: 30px 60px;
+}
+
+/* STATUS */
+.status {
+  background: #7a0042;
+  color: white;
+  font-size: 32px;
+  padding: 25px;
+  border-radius: 25px;
+  text-align: center;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 15px rgba(122,0,66,0.3);
+}
+
+/* MAIN BLOCK */
+.main {
+  display: flex;
+  gap: 40px;
+}
+
+/* QUIZ INFO */
+.quiz-info {
+  background: #e8e19f;
+  padding: 30px;
+  border-radius: 35px;
+  width: 45%;
+}
+
+.quiz-info h2 {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.quiz-info p {
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.quiz-info .label {
+  margin-top: 15px;
+  font-weight: 600;
+}
+
+/* RIGHT BLOCK */
+.right {
+  width: 45%;
+}
+
+.quiz-image {
+  width: 100%;
+  border-radius: 30px;
+  margin-bottom: 20px;
+}
+
+.author {
+  background: #d9d9d9;
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+
+.link-block {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.link-block input {
+  flex: 1;
+  border: none;
+  border-bottom: 2px solid #aaa;
+  background: transparent;
+  font-size: 18px;
+  padding: 10px 0;
+  outline: none;
+}
+
+.copy-icon, .code-copy-icon {
+  width: 36px;
+  height: 36px;
+  background: #d9d9d9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 18px;
+}
+
+.copy-icon:hover, .code-copy-icon:hover {
+  background: #7a0042;
+  color: white;
+}
+
+.code-block {
+  background: #d9d9d9;
+  padding: 15px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.code {
+  background: #7a0042;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 15px;
+  letter-spacing: 5px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* PLAYERS */
+.players-title {
+  font-size: 32px;
+  margin: 40px 0 20px 0;
+}
+
+.players {
+  background: #e9e9e9;
+  padding: 30px;
+  border-radius: 35px;
+  min-height: 150px;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+.yellow { background: #e9dc6a; }
+.purple { background: #7a0042; }
+.green { background: #a5c64b; }
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #7a0042;
+  color: white;
+  padding: 15px 30px;
+  border-radius: 40px;
+  font-size: 16px;
+  display: none;
+  z-index: 1000;
+}
+
+.organizer-controls {
+  position: relative; /* или absolute, если хочешь точно к нижнему краю */
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  width: 100%;
+}
+.btn {
+  padding: 15px 40px;
+  font-size: 20px;
+  font-weight: 600;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.start-btn {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.start-btn:hover {
+  background: var(--primary-dark);
+}
+
+.exit-btn {
+  background: var(--white);
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.exit-btn:hover {
+  background: #f0f0f0;
+}
+
+/* RIGHT BLOCK */
+        .right {
+            width: 45%;
+        }
+
+        .quiz-image {
+            width: 100%;
+            border-radius: 30px;
+            margin-bottom: 20px;
+        }
+
+        .author {
+            background: #d9d9d9;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .link-block {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .link-block input {
+            flex: 1;
+            border: none;
+            border-bottom: 2px solid #aaa;
+            background: transparent;
+            font-size: 18px;
+            padding: 10px 0;
+            outline: none;
+        }
+
+/* Адаптив */
+@media (max-width: 768px) {
+  body { padding: 20px; }
+  .main { flex-direction: column; }
+  .quiz-info, .right { width: 100%; }
+}s

@@ -310,8 +310,23 @@ public class QuizService {
                 ))
                 .toList();
     }
+    public List<HistoryItemResponse> getHistory(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("Пользователь не авторизован");
+        }
 
-    public QuizSubmitResponse submitQuiz(Long quizId, QuizSubmitRequest request) {
+        return resultRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(result -> new HistoryItemResponse(
+                        result.getId(),
+                        result.getQuiz().getId(),
+                        result.getQuiz().getName(),
+                        result.getScore(),
+                        result.getCreatedAt()
+                ))
+                .toList();
+    }
+
+    public QuizSubmitResponse submitQuiz(Long quizId, QuizSubmitRequest request, Long currentUserId) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new IllegalArgumentException("Квиз не найден: " + quizId));
 
@@ -386,12 +401,24 @@ public class QuizService {
                     if (question.getType().name().equals("OPEN")) {
                         String userTextAnswer = userAnswer != null ? userAnswer.getTextAnswer() : null;
 
+                        QuestionAnswerBond correctBond = bonds.stream()
+                                .filter(bond -> Boolean.TRUE.equals(bond.getIsCorrected()))
+                                .findFirst()
+                                .orElse(null);
+
+                        String correctAnswerText = correctBond != null ? correctBond.getAnswer().getText() : null;
+
+                        boolean isCorrect =
+                                userTextAnswer != null &&
+                                        correctAnswerText != null &&
+                                        userTextAnswer.trim().equalsIgnoreCase(correctAnswerText.trim());
+
                         return new QuestionResultResponse(
                                 question.getId(),
                                 question.getNumber(),
                                 question.getText(),
-                                false,
-                                null,
+                                isCorrect,
+                                correctAnswerText,
                                 userTextAnswer
                         );
                     }
@@ -413,10 +440,10 @@ public class QuizService {
         int wrongAnswers = totalQuestions - correctAnswers;
         int scorePercent = totalQuestions == 0 ? 0 : (correctAnswers * 100) / totalQuestions;
 
-        Result savedResult = resultRepository.save(
+        resultRepository.save(
                 Result.builder()
                         .score(scorePercent)
-                        .userId(null)
+                        .userId(currentUserId)
                         .quiz(quiz)
                         .createdAt(LocalDateTime.now())
                         .build()

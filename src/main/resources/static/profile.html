@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rufina:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat Alternates', sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+/* ===== HEADER & BURGER MENU ===== */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px 100px;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.logo {
+    font-family: 'Rufina', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+}
+
+.left-block {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.burger {
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: 0.3s;
+}
+
+.burger span {
+    position: absolute;
+    width: 30px;
+    height: 3px;
+    background: black;
+    border-radius: 2px;
+}
+
+.burger span:nth-child(1) { transform: translateY(-8px); }
+.burger span:nth-child(2) { transform: translateY(0); }
+.burger span:nth-child(3) { transform: translateY(8px); }
+
+.burger:hover {
+    background: #700143;
+}
+
+/* ВЫПАДАЮЩЕЕ МЕНЮ */
+.menu {
+    position: absolute;
+    left: 20%;
+    transform: translate(20px, -50%); /* 20px отступ вправо, центрируем по вертикали */
+    background: white;
+    padding: 20px 40px;
+    border-radius: 50px;
+    display: flex;
+    gap: 60px;
+
+    opacity: 0;
+    transform: translateX(-50px);
+    pointer-events: none;
+
+    transition: 0.4s ease;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.66);
+    z-index: 999;
+}
+
+.menu.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.menu-item {
+    text-decoration: none;
+    color: black;
+    font-size: 22px;
+    font-weight: 500;
+    position: relative;
+}
+
+.menu-item::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0%;
+    height: 4px;
+    background: #f2e46c;
+    transition: 0.4s;
+}
+
+.menu-item:hover::after,
+.menu-item.active::after {
+    width: 100%;
+}
+
+        /* КНОПКИ ОБЩЕЕ */
+        button {
+            border-radius: 50px;
+            font-family: 'Montserrat Alternates', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* КНОПКИ ВНИЗУ */
+        .action-buttons {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .back-btn, .settings-btn {
+            width: 55px;
+            height: 55px;
+            background: #f3df72;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .back-btn:hover, .settings-btn:hover {
+            background: #8a004f;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* ОСНОВА */
+        .main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin: 0 auto;
+            min-height: calc(100vh - 120px);
+            position: relative;
+            padding-bottom: 100px;
+        }
+
+        /* ЦЕНТРАЛЬНЫЙ БЛОК С ФОТО И ИМЕНЕМ */
+        .center-block {
+            text-align: center;
+            margin-top: -50px;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* КОНТЕЙНЕР ДЛЯ ЛЕВОЙ И ПРАВОЙ ЧАСТИ */
+        .content-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 0;
+            width: 100%;
+            position: relative;
+            margin-bottom: 80px;
+        }
+
+        .right-part {
+            width: 35%;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            margin-left: 100px;
+            margin-top: 0;
+            padding-top: 0;
+            left: 80px;
+        }
+
+        .left-part {
+            width: 35%;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            margin-right: 100px;
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        /* ПАЛОЧКА-РАЗДЕЛИТЕЛЬ ПО ЦЕНТРУ */
+        .content-wrapper::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #ccc, #8a004f, #ccc);
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        /* ПРАВАЯ ЧАСТЬ - СТАТИСТИКА */
+        .stats-row {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .stats-row p {
+            margin: 0;
+            text-align: left;
+            font-size: 16px;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        /* АВАТАР */
+        .avatar-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        .avatar {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: #f3df72;
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar img.default-avatar {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .avatar img:not(.default-avatar) {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ИМЯ В ЦЕНТРЕ ЭКРАНА */
+        #fullName {
+            text-align: center;
+            margin: 20px 0 5px 0;
+            font-size: 28px;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        #userId {
+            text-align: center;
+            margin-top: 0;
+            color: gray;
+            font-size: 14px;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        /* ИНФОРМАЦИЯ */
+        .info-row {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .info-row p {
+            margin: 0;
+            text-align: left;
+            font-size: 16px;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        /* ВЫРАВНИВАНИЕ ПЕРВЫХ СТРОК ЛЕВОЙ И ПРАВОЙ ЧАСТИ */
+        .info-row:first-child {
+            margin-top: 0;
+        }
+
+        .stats-row:first-child {
+            margin-top: 0;
+        }
+
+        .left-part, .right-part {
+            margin: 0;
+            padding: 0;
+        }
+
+        .left-part .info-row:first-child p,
+        .right-part .stats-row:first-child p {
+            line-height: 1.4;
+        }
+
+        .right-part {
+            margin-top: 0;
+            transform: translateY(0);
+        }
+
+        /* КНОПКА РЕДАКТИРОВАТЬ */
+        .edit-btn {
+            margin-top: 30px;
+            margin-left: 50px;
+            padding: 12px 24px;
+            width: auto;
+            display: inline-block;
+            border: 2px solid black;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: 'Montserrat Alternates', sans-serif;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            align-self: flex-start;
+        }
+
+        .edit-btn:hover {
+            background: #8a004f !important;
+            color: white !important;
+            border-color: #8a004f !important;
+        }
+
+        .edit-btn {
+            margin-top: 30px;
+            padding: 14px 50px;
+            border: 2px solid black;
+            background: white;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: 'Montserrat Alternates', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        /* ПАРОЛЬ */
+        .change-pass {
+            color: gray;
+            margin-left: 15px;
+            cursor: pointer;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        .change-pass:hover {
+            text-decoration: underline;
+        }
+
+        /* INPUT */
+        input, select {
+            border: none;
+            border-bottom: 1px solid black;
+            outline: none;
+            background: transparent;
+            padding: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: 'Montserrat Alternates', sans-serif;
+            color: black;
+        }
+
+        input::placeholder {
+            color: #999;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        /* МОДАЛКИ */
+        .modal {
+            display: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            width: 500px;
+            padding: 40px;
+            margin: 150px auto;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .modal-content h2 {
+            font-family: 'Montserrat Alternates', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        .password-input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .password-input-wrapper input {
+            width: 100%;
+            padding-right: 40px;
+            box-sizing: border-box;
+        }
+
+        .eye-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 20px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .eye-icon:hover {
+            opacity: 1;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            cursor: pointer;
+            font-size: 32px;
+            font-weight: bold;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        .close:hover {
+            color: #8a004f;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .yes, .no, .main-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 50px;
+            border: none;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        .yes {
+            background: white;
+            border: 2px solid black;
+        }
+
+        .no {
+            background: #8a004f;
+            color: white;
+        }
+
+        .main-btn {
+            background: #cccccc;
+            color: white;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .main-btn.active {
+            background: #8a004f;
+            color: white;
+            cursor: pointer;
+        }
+
+        .main-btn.active:hover {
+            background: #6a0038;
+        }
+
+        .error, .date-error {
+            color: red;
+            font-size: 12px;
+            display: block;
+            margin-top: 5px;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        #birth {
+            color: gray;
+        }
+
+        #birth.saved-date {
+            color: black;
+        }
+
+        #birthInput, #nicknameInput, #emailInput {
+            color: black;
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+
+        .left-part, .right-part {
+            align-self: center;
+        }
+
+        .right-part {
+            position: relative;
+        }
+
+        .right-part .stats-row {
+            margin-left: 0;
+            padding-left: 0;
+        }
+
+        .right-part .stats-row:first-child {
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        /* КНОПКИ ВНИЗУ */
+    .action-buttons {
+        position: fixed;
+        bottom: 30px;
+        left: 20px;
+        right: 20px;
+        display: flex;
+        justify-content: space-between;
+        z-index: 100;
+    }   
+
+    .back-btn, .settings-btn {
+        width: 55px;
+        height: 55px;
+        background: #f3df72;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .back-btn img, .settings-btn img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .back-btn:hover, .settings-btn:hover {
+        background: #8a004f;
+        transform: scale(1.05);
+    }
+
+    .back-btn:hover img, .settings-btn:hover img {
+        filter: brightness(0) invert(1);
+    }
+
+        @media (max-width: 768px) {
+            .menu {
+                top: 80px;
+                left: 20px;
+                right: 20px;
+                flex-direction: column;
+                gap: 20px;
+                border-radius: 30px;
+            }
+            .content-wrapper {
+                flex-direction: column;
+                align-items: center;
+            }
+            .content-wrapper::before {
+                display: none;
+            }
+            .left-part, .right-part {
+                width: 80%;
+                margin: 0;
+            }
+            .edit-btn {
+                margin-left: 0;
+            }
+            .action-buttons {
+                bottom: 20px;
+                left: 15px;
+                right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER из главной страницы -->
+<div class="header">
+
+    <div class="left-block">
+        <div class="logo">Q</div>
+
+        <div class="burger" id="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <nav class="menu" id="menu">
+        <a href="mainpage.html" class="menu-item" data-page="mainpage.html">Главная</a>
+        <a href="history.html" class="menu-item" data-page="history.html">История</a>
+        <a href="index.html" class="menu-item" data-page="index.html">Создание</a>
+        <a href="help.html" class="menu-item" data-page="help.html">Помощь</a>
+    </nav>
+
+    <!-- Пустой блок для сохранения структуры, без кнопки регистрации/входа -->
+    <div></div>
+
+</div>
+
+<div class="container">
+
+    <!-- ЦЕНТРАЛЬНЫЙ БЛОК С ФОТО И ИМЕНЕМ -->
+    <div class="center-block">
+        <div class="avatar-wrapper">
+            <div class="avatar" id="avatarContainer">
+                <img id="avatarPreview" src="img/photo.png" class="default-avatar">
+            </div>
+            <input type="file" id="avatarUpload" hidden accept="image/*">
+        </div>
+
+        <h2 id="fullName">Загрузка...</h2>
+        <p id="userId">id —</p>
+    </div>
+
+    <!-- КОНТЕЙНЕР ДЛЯ ЛЕВОЙ И ПРАВОЙ ЧАСТИ -->
+    <div class="content-wrapper">
+
+        <!-- ЛЕВАЯ ЧАСТЬ -->
+        <div class="left-part">
+            <div class="info">
+                <div class="info-row">
+                    <p>Никнейм: <span id="nickname">—</span></p>
+                </div>
+
+                <div class="info-row">
+                    <p>
+                        Дата рождения:
+                        <span id="birth">Впишите дату рождения</span>
+                        <span class="date-error" id="dateError"></span>
+                    </p>
+                </div>
+
+                <div class="info-row">
+                    <p>Пол: <span id="gender">жен</span></p>
+                </div>
+
+                <div class="info-row">
+                    <p>E-mail: <span id="email">—</span></p>
+                </div>
+
+                <div class="info-row">
+                    <p>
+                        Текущий пароль: <span id="passwordStars">******</span>
+                        <span class="change-pass" onclick="openPasswordModal()">сменить пароль</span>
+                    </p>
+                </div>
+            </div>
+
+            <button class="edit-btn" id="editBtn" onclick="toggleEdit()">Редактировать</button>
+            <button class="edit-btn" style="margin-top: 15px;" onclick="openLogoutModal()">Выйти</button>
+        </div>
+
+        <!-- ПРАВАЯ ЧАСТЬ -->
+        <div class="right-part">
+            <div class="stats-row">
+                <p>Кол-во набранных баллов: <span id="points">12450</span></p>
+            </div>
+            <div class="stats-row">
+                <p>Кол-во созданных квизов: <span id="created">12</span></p>
+            </div>
+            <div class="stats-row">
+                <p>Кол-во пройденных квизов: <span id="passed">5</span></p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- КНОПКИ ВНИЗУ: СТРЕЛКА И НАСТРОЙКИ -->
+<div class="action-buttons">
+    <button class="back-btn" onclick="goToMainPage()"><img src="img/back_arrow.png"></button>
+    <button class="settings-btn" onclick="openSettings()"><img src="img/settings.png"></button>
+</div>
+
+<!-- МОДАЛКА ПАРОЛЯ -->
+<div class="modal" id="passwordModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('passwordModal')">×</span>
+
+        <h2>Смена пароля</h2>
+
+        <div class="password-input-wrapper">
+            <input type="password" id="newPass" placeholder="Введите новый пароль">
+            <span class="eye-icon" onclick="togglePasswordVisibility('newPass', this)"></span>
+        </div>
+        
+        <div class="password-input-wrapper">
+            <input type="password" id="confirmPass" placeholder="Подтвердите пароль">
+            <span class="eye-icon" onclick="togglePasswordVisibility('confirmPass', this)"></span>
+        </div>
+
+        <p class="error" id="passError"></p>
+
+        <button class="main-btn" id="savePasswordBtn" onclick="savePassword()" disabled>Сохранить</button>
+    </div>
+</div>
+
+<!-- МОДАЛКА ВЫХОДА -->
+<div class="modal" id="logoutModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('logoutModal')">×</span>
+
+        <h2>Вы точно хотите выйти?</h2>
+
+        <div class="row">
+            <button class="yes" onclick="logout()">Да</button>
+            <button class="no" onclick="closeModal('logoutModal')">Нет</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // БУРГЕР
+    const burger = document.getElementById('burger');
+    const menu = document.getElementById('menu');
+
+    burger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.toggle('active');
+    });
+
+    // Закрытие меню при клике вне
+    document.addEventListener('click', (event) => {
+        if (!menu.contains(event.target) && !burger.contains(event.target)) {
+            menu.classList.remove('active');
+        }
+    });
+
+    // Меню - переход на страницы
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const page = item.getAttribute('data-page');
+            menu.classList.remove('active');
+            window.location.href = page;
+        });
+    });
+
+    let editMode = false;
+    let isDateValid = true;
+
+    // АВАТАР: при клике на фото открывается загрузка
+    const avatarContainer = document.getElementById("avatarContainer");
+    const avatarUpload = document.getElementById("avatarUpload");
+
+    if (avatarContainer) {
+        avatarContainer.addEventListener("click", function() {
+            if (avatarUpload) {
+                avatarUpload.click();
+            }
+        });
+    }
+
+    if (avatarUpload) {
+        avatarUpload.addEventListener("change", function() {
+            const file = this.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const avatarImg = document.getElementById("avatarPreview");
+                    if (avatarImg) {
+                        avatarImg.src = e.target.result;
+                        avatarImg.classList.remove("default-avatar");
+                    }
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+   function togglePasswordVisibility(inputId, eyeIcon) {
+    const input = document.getElementById(inputId);
+    const img = eyeIcon.querySelector('img') || eyeIcon;
+    
+    if (input.type === "password") {
+        input.type = "text";
+        // Меняем картинку на "глаз зачеркнутый" (показать, что пароль виден)
+        img.src = "img/eye_close.png";
+        img.alt = "Скрыть пароль";
+    } else {
+        input.type = "password";
+        // Меняем картинку на "открытый глаз" (пароль скрыт)
+        img.src = "img/eye_open.png";
+        img.alt = "Показать пароль";
+    }
+}
+
+    function toggleEdit() {
+        editMode = !editMode;
+        const btn = document.getElementById("editBtn");
+
+        if (editMode) {
+            btn.innerText = "Сохранить";
+            makeEditable("nickname");
+            makeEditable("email");
+            makeDateEditable();
+            makeGenderEditable();
+        } else {
+            if (validateAllFields()) {
+                btn.innerText = "Редактировать";
+                saveData();
+            } else {
+                editMode = true;
+                alert("Исправьте ошибки перед сохранением");
+            }
+        }
+    }
+
+    function validateAllFields() {
+        let isValid = true;
+        
+        const emailInput = document.getElementById("email");
+        if (emailInput && emailInput.value && !validateEmail(emailInput.value)) {
+            isValid = false;
+        }
+        
+        const birthInput = document.getElementById("birth");
+        if (birthInput && birthInput.value) {
+            let parts = birthInput.value.split(".");
+            let currentYear = new Date().getFullYear();
+            if (parts.length === 3) {
+                let day = parseInt(parts[0]);
+                let month = parseInt(parts[1]);
+                let year = parseInt(parts[2]);
+                let testDate = new Date(year, month - 1, day);
+                let isValidDate = testDate.getFullYear() === year && 
+                                  testDate.getMonth() === month - 1 && 
+                                  testDate.getDate() === day;
+                if (!isValidDate || year > currentYear - 5 || year < 1900) {
+                    isValid = false;
+                    isDateValid = false;
+                } else {
+                    isDateValid = true;
+                }
+            } else {
+                isValid = false;
+                isDateValid = false;
+            }
+        } else {
+            isDateValid = true;
+        }
+        
+        return isValid;
+    }
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
+        return re.test(email);
+    }
+
+    function makeEditable(id) {
+        let el = document.getElementById(id);
+        let input = document.createElement("input");
+        input.value = el.innerText;
+        input.id = id;
+        input.style.fontFamily = "'Montserrat Alternates', sans-serif";
+        input.style.color = "black";
+        
+        if (id === 'email') {
+            input.type = 'email';
+            input.addEventListener('input', () => {
+                const saveBtn = document.getElementById("editBtn");
+                if (editMode && validateAllFields()) {
+                    saveBtn.style.background = "#8a004f";
+                    saveBtn.style.color = "white";
+                } else if (editMode) {
+                    saveBtn.style.background = "white";
+                    saveBtn.style.color = "black";
+                }
+            });
+        }
+        
+        el.replaceWith(input);
+    }
+
+    function makeDateEditable() {
+        let el = document.getElementById("birth");
+
+        let input = document.createElement("input");
+        input.placeholder = "ДД.ММ.ГГГГ";
+        input.id = "birth";
+        input.value = el.innerText !== "Впишите дату рождения" ? el.innerText : "";
+        input.style.fontFamily = "'Montserrat Alternates', sans-serif";
+        input.style.color = "black";
+
+        let error = document.getElementById("dateError");
+
+        input.addEventListener("input", () => {
+            let v = input.value.replace(/\D/g, '').slice(0,8);
+
+            if (v.length >= 5)
+                input.value = v.slice(0,2) + '.' + v.slice(2,4) + '.' + v.slice(4);
+            else if (v.length >= 3)
+                input.value = v.slice(0,2) + '.' + v.slice(2);
+            else
+                input.value = v;
+                
+            const saveBtn = document.getElementById("editBtn");
+            if (editMode && validateAllFields()) {
+                saveBtn.style.background = "#8a004f";
+                saveBtn.style.color = "white";
+            } else if (editMode) {
+                saveBtn.style.background = "white";
+                saveBtn.style.color = "black";
+            }
+        });
+
+        input.addEventListener("blur", () => {
+            let parts = input.value.split(".");
+            let currentYear = new Date().getFullYear();
+            
+            if (!input.value) {
+                error.innerText = "";
+                isDateValid = true;
+            } else if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) {
+                error.innerText = "Введите полную дату рождения";
+                isDateValid = false;
+            } else {
+                let day = parseInt(parts[0]);
+                let month = parseInt(parts[1]);
+                let year = parseInt(parts[2]);
+                let testDate = new Date(year, month - 1, day);
+                let isValidDate = testDate.getFullYear() === year && 
+                                  testDate.getMonth() === month - 1 && 
+                                  testDate.getDate() === day;
+                
+                let age = currentYear - year;
+                
+                if (!isValidDate) {
+                    error.innerText = "Такой даты не существует";
+                    isDateValid = false;
+                } else if (year > currentYear - 5 || year < 1900) {
+                    error.innerText = "Возраст должен быть от 5 до 120 лет";
+                    isDateValid = false;
+                } else {
+                    error.innerText = "";
+                    isDateValid = true;
+                }
+            }
+            
+            const saveBtn = document.getElementById("editBtn");
+            if (editMode && validateAllFields()) {
+                saveBtn.style.background = "#8a004f";
+                saveBtn.style.color = "white";
+            } else if (editMode) {
+                saveBtn.style.background = "white";
+                saveBtn.style.color = "black";
+            }
+        });
+
+        el.replaceWith(input);
+    }
+
+    function makeGenderEditable() {
+        let el = document.getElementById("gender");
+
+        let select = document.createElement("select");
+        select.id = "gender";
+        select.style.fontFamily = "'Montserrat Alternates', sans-serif";
+        select.style.color = "black";
+        
+        let currentGender = el.innerText;
+
+        ["жен", "муж"].forEach(g => {
+            let opt = document.createElement("option");
+            opt.value = g;
+            opt.text = g;
+            if (g === currentGender) {
+                opt.selected = true;
+            }
+            select.appendChild(opt);
+        });
+
+        el.replaceWith(select);
+    }
+
+    function saveData() {
+        let nickname = document.getElementById("nickname");
+        let birth = document.getElementById("birth");
+        let email = document.getElementById("email");
+        let gender = document.getElementById("gender");
+
+        nickname.outerHTML = `<span id="nickname" style="font-family: 'Montserrat Alternates', sans-serif;">${nickname.value}</span>`;
+        
+        let birthText = birth.value || "Впишите дату рождения";
+        let birthColorClass = birth.value ? 'saved-date' : '';
+        birth.outerHTML = `<span id="birth" class="${birthColorClass}" style="font-family: 'Montserrat Alternates', sans-serif;">${birthText}</span>`;
+        
+        email.outerHTML = `<span id="email" style="font-family: 'Montserrat Alternates', sans-serif;">${email.value}</span>`;
+        gender.outerHTML = `<span id="gender" style="font-family: 'Montserrat Alternates', sans-serif;">${gender.value}</span>`;
+        
+        const dateError = document.getElementById('dateError');
+        if (dateError) dateError.innerText = "";
+        
+        const editBtn = document.getElementById("editBtn");
+        editBtn.style.background = "white";
+        editBtn.style.color = "black";
+    }
+
+    function openPasswordModal() {
+        document.getElementById("newPass").value = "";
+        document.getElementById("confirmPass").value = "";
+        document.getElementById("passError").innerText = "";
+        const saveBtn = document.getElementById("savePasswordBtn");
+        saveBtn.disabled = true;
+        saveBtn.classList.remove("active");
+        document.getElementById("passwordModal").style.display = "block";
+    }
+
+    function updatePasswordStars() {
+        const newPass = document.getElementById("newPass").value;
+        const starsCount = newPass.length;
+        const stars = "*".repeat(starsCount);
+        document.getElementById("passwordStars").innerText = stars || "******";
+    }
+
+    function checkPasswordForm() {
+        const p1 = document.getElementById("newPass").value;
+        const p2 = document.getElementById("confirmPass").value;
+        const saveBtn = document.getElementById("savePasswordBtn");
+        const passError = document.getElementById("passError");
+        
+        if (p1.length >= 6 && p1 === p2) {
+            saveBtn.disabled = false;
+            saveBtn.classList.add("active");
+            passError.innerText = "";
+        } else {
+            saveBtn.disabled = true;
+            saveBtn.classList.remove("active");
+            if (p1 !== p2 && p1.length > 0 && p2.length > 0) {
+                passError.innerText = "Пароли не совпадают";
+            } else if (p1.length > 0 && p1.length < 6) {
+                passError.innerText = "Пароль должен быть не менее 6 символов";
+            } else {
+                passError.innerText = "";
+            }
+        }
+        
+        updatePasswordStars();
+    }
+
+    document.getElementById("newPass")?.addEventListener("input", checkPasswordForm);
+    document.getElementById("confirmPass")?.addEventListener("input", checkPasswordForm);
+
+    function savePassword() {
+        let p1 = document.getElementById("newPass").value;
+        
+        if (p1.length >= 6) {
+            updatePasswordStars();
+            alert("Пароль успешно изменен!");
+            closeModal("passwordModal");
+            document.getElementById("passError").innerText = "";
+        }
+    }
+
+    function openLogoutModal() {
+        document.getElementById("logoutModal").style.display = "block";
+    }
+
+    function openSettings() {
+        alert("Настройки в разработке");
+    }
+
+function openSettings() {
+    alert("Настройки в разработке");
+}
+
+async function logout() {
+    try {
+        await fetch("/api/auth/logout", {
+            method: "POST",
+            credentials: "include"
+        });
+    } catch (e) {
+        console.error("Ошибка при выходе из аккаунта", e);
+    } finally {
+        window.location.href = "login.html";
+    }
+}
+
+function goToMainPage() {
+    window.location.href = "mainpage.html";
+}
+
+    function goToMainPage() {
+        window.location.href = "mainpage.html";
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = "none";
+        }
+    }
+</script>
+<script>
+    async function requireAuth() {
+        try {
+            const response = await fetch('/api/auth/me', {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const user = await response.json();
+
+        const fullNameEl = document.getElementById('fullName');
+        const nicknameEl = document.getElementById('nickname');
+        const emailEl = document.getElementById('email');
+        const userIdEl = document.getElementById('userId');
+
+        if (fullNameEl) fullNameEl.textContent = user.name || 'Без имени';
+        if (nicknameEl) nicknameEl.textContent = user.name || '—';
+        if (emailEl) emailEl.textContent = user.email || '—';
+        if (userIdEl) userIdEl.textContent = `id ${user.id}`;
+        } catch (e) {
+            window.location.href = 'login.html';
+        }
+    }
+
+    requireAuth();
+</script>
+<script type="module" src="js/header.js"></script>
+</body>
+</html>

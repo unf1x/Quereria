@@ -1,0 +1,123 @@
+/* ===== HEADER & BURGER MENU ===== */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.logo {
+    font-family: 'Rufina', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+}
+
+.left-block {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.burger {
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: 0.3s;
+}
+
+.burger span {
+    position: absolute;
+    width: 30px;
+    height: 3px;
+    background: black;
+    border-radius: 2px;
+}
+
+.burger span:nth-child(1) { transform: translateY(-8px); }
+.burger span:nth-child(2) { transform: translateY(0); }
+.burger span:nth-child(3) { transform: translateY(8px); }
+
+.burger:hover {
+    background: #700143;
+}
+
+/* ВЫПАДАЮЩЕЕ МЕНЮ */
+.menu {
+    position: absolute;
+    left: 20%;
+    transform: translate(20px, -50%); /* 20px отступ вправо, центрируем по вертикали */
+    background: white;
+    padding: 20px 40px;
+    border-radius: 50px;
+    display: flex;
+    gap: 60px;
+
+    opacity: 0;
+    transform: translateX(-50px);
+    pointer-events: none;
+
+    transition: 0.4s ease;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.66);
+    z-index: 999;
+}
+
+.menu.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.menu-item {
+    text-decoration: none;
+    color: black;
+    font-size: 22px;
+    font-weight: 500;
+    position: relative;
+}
+
+.menu-item::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0%;
+    height: 4px;
+    background: #f2e46c;
+    transition: 0.4s;
+}
+
+.menu-item:hover::after,
+.menu-item.active::after {
+    width: 100%;
+}
+
+.profile {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e9dc6a;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.profile:hover {
+    transform: scale(1.05);
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .menu {
+        flex-direction: column;
+        gap: 20px;
+        top: 80px; /* чуть ниже бургера */
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}

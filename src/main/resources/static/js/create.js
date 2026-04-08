@@ -263,7 +263,7 @@ finishBtn.addEventListener("click", function () {
     questions
   };
 
-  fetch("http://localhost:8080/api/quizzes", {
+  fetch("/api/quizzes", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -280,7 +280,7 @@ finishBtn.addEventListener("click", function () {
     })
     .then(data => {
       alert("Квиз сохранён");
-      window.location.href = "index.html";
+      window.location.href = `viewquiz.html?id=${data.id}`;
     })
     .catch(err => {
       console.error(err);

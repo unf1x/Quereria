@@ -1,0 +1,22 @@
+:root {
+  --primary: #8c005a;
+  --primary-dark: #6f0047;
+  --accent: #e5d35c;
+  --bg: #f3f3f3;
+  --white: #ffffff;
+}
+
+body {
+  background: var(--bg);
+  color: #333;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+a{
+    text-decoration: none;
+}

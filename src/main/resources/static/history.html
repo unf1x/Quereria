@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>История</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rufina:wght@700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+<header class="header">
+  <div class="left-block">
+    <div class="logo">Q</div>
+    <div class="burger" id="burger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <nav class="menu" id="menu">
+    <a href="mainpage.html" class="menu-item" data-page="mainpage.html">Главная</a>
+    <a href="history.html" class="menu-item" data-page="history.html">История</a>
+    <a href="index.html" class="menu-item" data-page="index.html">Создание</a>
+    <a href="help.html" class="menu-item" data-page="help.html">Помощь</a>
+  </nav>
+
+  <div class="profile" id="profileBtn"></div>
+</header>
+
+
+<main class="container">
+    <h1>История</h1>
+    <div id="history-list" class="quiz-list"></div>
+</main>
+<script>
+    async function loadHistory() {
+      const container = document.getElementById("history-list");
+      container.innerHTML = "<p>Загрузка...</p>";
+
+      try {
+        const response = await fetch("/api/quizzes/history", {
+          method: "GET",
+          credentials: "include"
+});
+
+        if (!response.ok) {
+          throw new Error("Не удалось загрузить историю");
+        }
+
+        const items = await response.json();
+        container.innerHTML = "";
+
+        if (!items.length) {
+          container.innerHTML = "<p>История пока пуста</p>";
+          return;
+        }
+
+        items.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "quiz-card";
+
+          const date = item.createdAt
+            ? new Date(item.createdAt).toLocaleString("ru-RU")
+            : "—";
+
+          card.innerHTML = `
+            <h3>${item.quizTitle}</h3>
+            <p>Результат: ${item.score}%</p>
+            <p>Дата: ${date}</p>
+            <button data-id="${item.quizId}">Открыть квиз</button>
+          `;
+
+          card.querySelector("button").addEventListener("click", () => {
+            window.location.href = `viewquiz.html?id=${item.quizId}`;
+          });
+
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error(error);
+        container.innerHTML = "<p>Не удалось загрузить историю</p>";
+      }
+    }
+
+    loadHistory();
+</script>
+<script type="module" src="js/header.js"></script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Квиз — ведущий + лидеры</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600&family=Rufina:wght@700&display=swap" rel="stylesheet">
+<style>
+/* ===== GLOBAL ===== */
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Montserrat Alternates',sans-serif;}
+body {background:#eeeeee; padding:30px; transition:padding 0.3s;}
+body.leaderboard-active {padding:0;}
+.header {display:flex; justify-content:space-between; margin-bottom:30px; padding:0 30px;}
+.logo {font-family:'Rufina',serif; font-size:42px;}
+.profile {width:60px; height:60px; border-radius:50%; background:#e9dc6a;}
+
+/* ===== TIMER ===== */
+.timer-container {display:flex; justify-content:center; margin-top:100px;}
+.timer {position:relative;}
+.timer svg {transform:rotate(-90deg);}
+.progress {stroke:url(#grad); stroke-dasharray:0; stroke-dashoffset:0; transition:stroke-dashoffset 0.05s linear;}
+.bg {stroke:#ddd;}
+.number {position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:80px;}
+
+/* ===== QUESTION ===== */
+.question-page {display:none;}
+.question-container {background:white; padding:40px; border-radius:40px; max-width:800px; margin:auto;}
+.question-header {display:flex; justify-content:space-between; margin-bottom:20px;}
+.timer-large {font-size:24px; background:#f8f8f8; padding:10px 20px; border-radius:30px;}
+.question-title {font-size:28px; margin-bottom:20px;}
+.options-grid {display:flex; flex-direction:column; gap:15px;}
+.option {padding:15px; border-radius:30px; background:#f5f5f5; position:relative; cursor:pointer;}
+.option.correct {background:linear-gradient(135deg,#d4edda,#c3e6cb); border:2px solid #28a745; font-weight:600;}
+.option.correct::after {content:"✔"; position:absolute; right:20px; font-size:20px; color:#28a745;}
+.option.incorrect {background:linear-gradient(135deg,#f8d7da,#f5c6cb); border:2px solid #dc3545; font-weight:600;}
+.control-buttons {display:flex; gap:10px; margin-top:30px;}
+button {flex:1; padding:15px; border-radius:30px; border:none; cursor:pointer; font-weight:600;}
+.continue-btn {background:linear-gradient(135deg,#700143,#700143); color:white;}
+.pause-btn {background:#eee;}
+.end-btn {background:#700143; color:white;}
+
+/* ===== LEADERBOARD ===== */
+.leaderboard-page {display:none; padding:40px 0; min-height:100vh; background:#7a003c;}
+.leaderboard-container {max-width:750px; margin:auto; background:#f1f1f1; border-radius:30px; padding:40px; text-align:center;}
+.leaderboard-title {font-size:32px; font-weight:700; margin-bottom:10px;}
+.subtitle {font-size:22px; margin-bottom:20px; position:relative;}
+.subtitle::after {content:""; display:block; height:2px; background:#ccc; width:80%; margin:10px auto;}
+.leaderboard-list {background:#e3e3e3; border-radius:25px; padding:20px;}
+.leaderboard-item {display:flex; align-items:center; padding:15px; border-radius:20px; margin-bottom:10px;}
+.leaderboard-item.first {background:#dcdcdc;}
+.rank-number {width:30px; text-align:center;}
+.avatar {width:30px; height:30px; border-radius:50%; margin:0 15px;}
+.avatar.purple {background:#800040;}
+.avatar.blue {background:#2d4ed8;}
+.avatar.green {background:#a4c639;}
+.rank-name {flex:1; text-align:left; font-size:18px;}
+.rank-score {font-size:18px;}
+.buttons {display:flex; justify-content:space-between; margin-top:30px;}
+.btn {flex:1; margin:0 10px; padding:12px; border-radius:30px; border:none; color:white; font-weight:600; cursor:pointer; background:#800040; transition:0.3s;}
+.btn:hover {transform:translateY(-3px);}
+</style>
+</head>
+<body>
+
+<!-- TIMER -->
+<div id="timerPage">
+    <div class="header"><div class="logo">Q</div><div class="profile"></div></div>
+    <div class="timer-container">
+        <div class="timer">
+            <svg width="300" height="300">
+                <defs>
+                    <linearGradient id="grad">
+                        <stop offset="0%" stop-color="#E9DC6A"/>
+                        <stop offset="100%" stop-color="#700143"/>
+                    </linearGradient>
+                </defs>
+                <circle class="bg" cx="150" cy="150" r="120" stroke-width="15" fill="none"/>
+                <circle class="progress" cx="150" cy="150" r="120" stroke-width="15" fill="none"/>
+            </svg>
+            <div class="number" id="timerNumber">3</div>
+        </div>
+    </div>
+</div>
+
+<!-- QUESTION -->
+<div class="question-page" id="questionPage">
+    <div class="header"><div class="logo">Q</div><div class="profile"></div></div>
+    <div class="question-container">
+        <div class="question-header">
+            <span id="questionNumber">Вопрос 1</span>
+            <span class="timer-large" id="questionTimer">15с</span>
+        </div>
+        <h2 class="question-title" id="questionText"></h2>
+        <div class="options-grid" id="optionsList"></div>
+        <div class="control-buttons">
+            <button class="continue-btn" id="continueBtn">Проверить ответ</button>
+            <button class="pause-btn" id="pauseBtn">Пауза</button>
+            <button class="end-btn" id="endBtn">Завершить</button>
+        </div>
+    </div>
+</div>
+
+<!-- INTERMEDIATE LEADERBOARD -->
+<div class="leaderboard-page" id="intermediateLeaderboard">
+    <div class="header"><div class="logo">Q</div><div class="profile"></div></div>
+    <div class="leaderboard-container">
+        <h1 class="leaderboard-title">Промежуточная таблица</h1>
+        <div class="subtitle">Текущие очки игроков</div>
+        <div class="leaderboard-list" id="intermediateList"></div>
+        <div class="buttons">
+            <button class="btn" id="continueQuizBtn">Продолжить квиз</button>
+        </div>
+    </div>
+</div>
+
+<!-- FINAL LEADERBOARD -->
+<div class="leaderboard-page" id="leaderboardPage">
+    <div class="header"><div class="logo">Q</div><div class="profile"></div></div>
+    <div class="leaderboard-container">
+        <h1 class="leaderboard-title">Исторический батл — финал</h1>
+        <div class="subtitle">Таблица лидеров</div>
+        <div class="leaderboard-list" id="leaderboardList"></div>
+        <div class="buttons">
+            <button class="btn" id="newQuizBtn">Новый квиз</button>
+            <button class="btn" id="exitBtn">Выход</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===== ДАННЫЕ =====
+const questions = [
+    {question:"Кто был первым римским императором?", options:[{text:"Юлий Цезарь", correct:false},{text:"Октавиан Август", correct:true},{text:"Нерон", correct:false}]},
+    {question:"Столица Франции?", options:[{text:"Берлин", correct:false},{text:"Париж", correct:true},{text:"Рим", correct:false}]}
+];
+const leaderboardData = [
+    {name:"МурМур (Я)", score:0},
+    {name:"Ягуар", score:20},
+    {name:"Панда", score:0}
+];
+
+// ===== ЭЛЕМЕНТЫ =====
+const timerPage=document.getElementById('timerPage');
+const questionPage=document.getElementById('questionPage');
+const leaderboardPage=document.getElementById('leaderboardPage');
+const intermediateLeaderboard=document.getElementById('intermediateLeaderboard');
+const timerNumber=document.getElementById('timerNumber');
+const questionTimer=document.getElementById('questionTimer');
+const continueBtn=document.getElementById('continueBtn');
+const pauseBtn=document.getElementById('pauseBtn');
+const endBtn=document.getElementById('endBtn');
+const continueQuizBtn=document.getElementById('continueQuizBtn');
+const circle=document.querySelector('.progress');
+const radius=120;
+const circumference=2*Math.PI*radius;
+circle.style.strokeDasharray=circumference;
+circle.style.strokeDashoffset=circumference;
+
+// ===== СОСТОЯНИЕ =====
+let currentQuestionIndex=0;
+let questionTimeLeft=15;
+let interval;
+let paused=false;
+
+// ===== ПЛАВНЫЙ ТАЙМЕР СТАРТА =====
+function startIntroTimer(seconds){
+    let start=Date.now();
+    function animate(){
+        let elapsed=(Date.now()-start)/1000;
+        let timeLeftSec=Math.ceil(seconds-elapsed);
+        if(timeLeftSec<0) timeLeftSec=0;
+        timerNumber.textContent=timeLeftSec;
+        circle.style.strokeDashoffset=circumference*(elapsed/seconds);
+        if(elapsed<seconds){
+            requestAnimationFrame(animate);
+        } else {
+            timerPage.style.display='none';
+            questionPage.style.display='block';
+            renderQuestion();
+            startQuestionTimer();
+        }
+    }
+    animate();
+}
+
+// ===== РЕНДЕР ВОПРОСА =====
+function renderQuestion(){
+    const q=questions[currentQuestionIndex];
+    document.getElementById('questionText').textContent=q.question;
+    document.getElementById('questionNumber').textContent="Вопрос "+(currentQuestionIndex+1);
+    const list=document.getElementById('optionsList');
+    list.innerHTML='';
+    q.options.forEach(opt=>{
+        const div=document.createElement('div');
+        div.className='option';
+        div.textContent=opt.text;
+        div.dataset.correct = opt.correct;
+        div.addEventListener('click',()=>{
+            document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+            div.classList.add('selected');
+        });
+        list.appendChild(div);
+    });
+}
+
+// ===== ТАЙМЕР ВОПРОСА =====
+function startQuestionTimer(reset=true){
+    clearInterval(interval);
+    if(reset) questionTimeLeft=15;
+    questionTimer.textContent=questionTimeLeft+'с';
+    interval=setInterval(()=>{
+        questionTimeLeft--;
+        questionTimer.textContent=questionTimeLeft+'с';
+        if(questionTimeLeft<=0){
+            clearInterval(interval);
+            nextQuestion();
+        }
+    },1000);
+}
+
+// ===== ОБРАБОТКА ВОПРОСА =====
+continueBtn.onclick = () => {
+    const selectedOption = document.querySelector('.option.selected');
+    if(selectedOption){
+        if(selectedOption.dataset.correct === "true"){
+            leaderboardData[0].score += 10; // начисляем очки текущему игроку
+        }
+    }
+    clearInterval(interval);
+    nextQuestion();
+};
+
+pauseBtn.onclick = () => {
+    if(paused){startQuestionTimer(false); pauseBtn.textContent='Пауза';}
+    else{clearInterval(interval); pauseBtn.textContent='Продолжить';}
+    paused=!paused;
+};
+
+endBtn.onclick = () => {clearInterval(interval); showFinalLeaderboard();};
+
+// ===== СЛЕДУЮЩИЙ ВОПРОС =====
+function nextQuestion(){
+    questionPage.style.display='none';
+    showIntermediateLeaderboard();
+}
+
+// ===== ПРОМЕЖУТОЧНАЯ ТАБЛИЦА =====
+function showIntermediateLeaderboard(){
+    intermediateLeaderboard.style.display='block';
+    document.body.classList.add('leaderboard-active');
+    const list = document.getElementById('intermediateList');
+    list.innerHTML='';
+    const colors=['purple','blue','green'];
+    leaderboardData.forEach((player,index)=>{
+        const div = document.createElement('div');
+        div.className='leaderboard-item';
+        if(index===0) div.classList.add('first');
+        div.innerHTML = `
+            <span class="rank-number">${index+1}</span>
+            <div class="avatar ${colors[index%colors.length]}"></div>
+            <span class="rank-name">${player.name}</span>
+            <span class="rank-score">${player.score}</span>
+        `;
+        list.appendChild(div);
+    });
+}
+
+continueQuizBtn.onclick = () => {
+    intermediateLeaderboard.style.display='none';
+    document.body.classList.remove('leaderboard-active');
+    currentQuestionIndex++;
+    if(currentQuestionIndex < questions.length){
+        renderQuestion();
+        questionPage.style.display='block';
+        startQuestionTimer();
+    } else showFinalLeaderboard();
+}
+
+// ===== ФИНАЛЬНАЯ ТАБЛИЦА =====
+function showFinalLeaderboard(){
+    questionPage.style.display='none';
+    intermediateLeaderboard.style.display='none';
+    leaderboardPage.style.display='block';
+    document.body.classList.add('leaderboard-active');
+    leaderboardData.sort((a,b)=>b.score-a.score);
+    const list=document.getElementById('leaderboardList');
+    list.innerHTML='';
+    const colors=['purple','blue','green'];
+    leaderboardData.forEach((player,index)=>{
+        const div=document.createElement('div');
+        div.className='leaderboard-item';
+        if(index===0) div.classList.add('first');
+        div.innerHTML=`
+            <span class="rank-number">${index+1}</span>
+            <div class="avatar ${colors[index%colors.length]}"></div>
+            <span class="rank-name">${player.name}</span>
+            <span class="rank-score">${player.score}</span>
+        `;
+        list.appendChild(div);
+    });
+}
+
+// ===== КНОПКИ НОВЫЙ КВИЗ / ВЫХОД =====
+document.getElementById('newQuizBtn').onclick = () => {
+    const params = new URLSearchParams(window.location.search);
+    const quizId = params.get('quizId');
+    if (quizId) {
+        window.location.href = `waitingroom_user.html?quizId=${quizId}`;
+    } else {
+        window.location.href = 'index.html';
+    }
+};
+document.getElementById('exitBtn').onclick = () => {window.location.href='index.html';};
+
+// ===== ЗАПУСК =====
+startIntroTimer(5);
+</script>
+<script type="module" src="js/header.js"></script>
+</body>
+</html>

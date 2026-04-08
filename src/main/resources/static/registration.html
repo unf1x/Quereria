@@ -211,17 +211,18 @@ submitBtn.addEventListener('click', async () => {
     }
 
     try {
-        const response = await fetch('http://localhost:8080/api/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: nameInput.value.trim(),
-                email: emailInput.value.trim(),
-                password: passwordInput.value.trim()
-            })
-        });
+    const response = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify({
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        password: passwordInput.value.trim()
+    })
+});
 
         const data = await response.json();
 
@@ -238,7 +239,7 @@ submitBtn.addEventListener('click', async () => {
         checkbox.classList.remove('active');
         checkForm();
 
-        window.location.href = 'index.html';
+        window.location.href = 'mainpage.html';
     } catch (error) {
         alertBox.style.display = "block";
         alertBox.textContent = error.message || "Ошибка регистрации";
@@ -249,6 +250,6 @@ submitBtn.addEventListener('click', async () => {
     }
 });
 </script>
-
+<script type="module" src="js/header.js"></script>
 </body>
 </html>

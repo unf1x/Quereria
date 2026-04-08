@@ -1,0 +1,87 @@
+/* HERO (верхний баннер) */
+.hero {
+    height: 250px;
+    background: url('../img/flowerbackgr.jpg') center/cover no-repeat;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+/* КНОПКА */
+.primary-btn {
+    background: #8a004f;
+    color: white;
+    padding: 15px 35px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.primary-btn:hover {
+    transform: scale(1.05);
+}
+
+/* БЛОК С КВИЗАМИ */
+.recent h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* СЕТКА КАРТОЧЕК */
+.quiz-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+/* КАРТОЧКА */
+.quiz-card {
+    background: white;
+    
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* ХОВЕР ЭФФЕКТ (как у тебя в карусели) */
+.quiz-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+/* КАРТИНКА */
+.quiz-image {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    background-color: white;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+/* КОНТЕНТ */
+.quiz-content {
+    padding: 10px;
+    background: white;
+}
+
+.quiz-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: black;
+}
+
+.quiz-meta {
+    font-size: 14px;
+    color: black;
+}

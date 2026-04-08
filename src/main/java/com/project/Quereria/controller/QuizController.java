@@ -4,6 +4,7 @@ import com.project.Quereria.dto.request.QuizSubmitRequest;
 import com.project.Quereria.dto.response.*;
 import com.project.Quereria.dto.request.QuizRequest;
 import com.project.Quereria.service.QuizService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,13 +42,22 @@ public class QuizController {
     @PostMapping("/{id}/submit")
     public ResponseEntity<QuizSubmitResponse> submitQuiz(
             @PathVariable Long id,
-            @RequestBody QuizSubmitRequest request
+            @RequestBody QuizSubmitRequest request,
+            HttpSession session
     ) {
-        return ResponseEntity.ok(quizService.submitQuiz(id, request));
+        Object userIdObj = session.getAttribute("userId");
+        Long currentUserId = userIdObj != null ? Long.valueOf(userIdObj.toString()) : null;
+        return ResponseEntity.ok(quizService.submitQuiz(id, request, currentUserId));
     }
 
     @GetMapping("/{id}/results")
     public ResponseEntity<List<ResultResponse>> getQuizResults(@PathVariable Long id) {
         return ResponseEntity.ok(quizService.getQuizResults(id));
+    }
+    @GetMapping("/history")
+    public ResponseEntity<List<HistoryItemResponse>> getHistory(HttpSession session) {
+        Object userIdObj = session.getAttribute("userId");
+        Long userId = userIdObj != null ? Long.valueOf(userIdObj.toString()) : null;
+        return ResponseEntity.ok(quizService.getHistory(userId));
     }
 }
